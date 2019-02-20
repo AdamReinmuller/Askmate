@@ -1,5 +1,6 @@
 import csv
 
+
 def import_csv(filename):
     with open(filename) as file:
         csv_content = list(csv.DictReader(file))

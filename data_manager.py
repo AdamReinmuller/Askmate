@@ -44,3 +44,15 @@ def get_ordered_dict_by_id(filename, id):
     for row in nested_ordered_dicts:
         if int(row['id']) == id:
             return row
+    connection.export_csv('data/question.csv', new_content)
+
+
+def delete_answer_from_csv(id_):
+    table = connection.import_csv('data/answer.csv')
+    temp = []
+    for answer in table:
+        if answer['id'] == id_:
+            pass
+        else:
+            temp.append(answer)
+    connection.export_csv('data/answer.csv', temp)
