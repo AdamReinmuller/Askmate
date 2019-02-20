@@ -11,4 +11,3 @@ def get_headers(file):
     return headers
 
 
-#print(get_headers('data/question.csv'))
