@@ -27,5 +27,17 @@ def delete_answer_from_csv(id_):
     connection.export_csv('data/answer.csv', temp)
 
 
+def delete_question_from_csv(id_):
+    table = connection.import_csv('data/question.csv')
+    temp = []
+    for answer in table:
+        if answer['id'] == id_:
+            pass
+        else:
+            temp.append(answer)
+    connection.export_csv('data/question.csv', temp)
+
+
+
 if __name__ == '__main__':
-    delete_answer_from_csv(3)
+    delete_question_from_csv('1')
