@@ -16,14 +16,16 @@ def new_question(form_title, form_question):
                    }
     connection.export_csv('data/question.csv', new_content)
 
+def delete_answer_from_csv(id_):
+    table = connection.import_csv('data/answer.csv')
+    temp = []
+    for answer in table:
+        if answer['id'] == id_:
+            pass
+        else:
+            temp.append(answer)
+    connection.export_csv('data/answer.csv', temp)
+
 
 if __name__ == '__main__':
-    new_content = {'id': 'vmi',
-                   'submission_time': 'vmi',
-                   'view_number': 'vmi',
-                   'vote_number': 'valami',
-                   'title': 'requ',
-                   'message': 'request',
-                   'image': 'valami'}
-    print(util.get_headers('data/question.csv'))
-
+    delete_answer_from_csv(3)
