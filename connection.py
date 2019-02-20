@@ -1,5 +1,6 @@
 import csv
 
+
 def import_csv(filename):
     with open(filename) as file:
         csv_content = list(csv.DictReader(file))
@@ -11,7 +12,7 @@ def export_csv(filename, content_dict):
     """
     :param filename:
     :param content_dict: is a list of ordered dicts
-    :return:
+    Beware: it deletes the content
     """
     fieldnames = util.get_headers(filename)
     with open(filename, "w") as file:
