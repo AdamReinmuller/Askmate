@@ -10,7 +10,7 @@ app = Flask(__name__)
 @app.route('/')
 @app.route('/list')
 def route_index():
-    questions = connection.import_csv('data/question.csv')
+    questions = sorted(connection.import_csv('data/question.csv'), key=lambda k: k['id'], reverse=True)
     header = util.get_headers('data/question.csv')[4]
 
     return render_template('index.html', questions=questions, header=header)
@@ -29,12 +29,12 @@ def route_question(question_id):
 def post_answer(question_id):
     if request.method == 'GET':
         single_question = data_manager.get_ordered_dict_by_id('data/question.csv', int(question_id))
-        question_message = single_question['message']
-        return render_template('post-answer.html', question_message=question_message)
+        question_title = single_question['title']
+        return render_template('post-answer.html', question_title=question_title)
     elif request.method == 'POST':
         form_answer = request.form['answer_message']
-        data_manager.new_answer(question_id, form_answer)
-        return redirect('/question/<int:question_id>')
+        data_manager.add_answer(question_id, form_answer)
+        return redirect('/question/{}'.format(question_id))
 
 
 @app.route('/add-question', methods=['GET', 'POST'])
@@ -42,20 +42,20 @@ def add_new_question():
     if request.method == 'GET':
         return render_template('add_questions.html')
     else:
-        data_manager.new_question(request.form['question_title'], request.form['question'])
+        data_manager.add_question(request.form['question_title'], request.form['question'])
         question_id = util.get_id("data/question.csv")
         return redirect('/question/{}'.format(question_id))
 
 
 @app.route('/answer/<answer_id>/delete')
 def delete_answer(answer_id=None):
-    data_manager.delete_answer_from_csv(answer_id)
+    data_manager.delete_line_from_csv('data/answer.csv', answer_id)
     return redirect('/add-question')
 
 
 @app.route('/answer/<question_id>/delete')
 def delete_question(question_id=None):
-    data_manager.delete_question_from_csv(question_id)
+    data_manager.delete_line_from_csv('data/question.csv', question_id)
     return redirect('/add-question')
 
 

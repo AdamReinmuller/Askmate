@@ -17,6 +17,7 @@ def export_csv(filename, content_dict):
     fieldnames = util.get_headers(filename)
     with open(filename, "w") as file:
         writer = csv.DictWriter(file, fieldnames=fieldnames)
+        writer.writeheader()
         writer.writerows(content_dict)
 
 

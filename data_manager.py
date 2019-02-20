@@ -31,7 +31,7 @@ def add_answer(question_id, form_answer):
                    'image': 'No image'
                    }
     nested_ordered_dict.insert(0, new_content)
-    connection.export_csv('data/answer.csv', new_content)
+    connection.export_csv('data/answer.csv', nested_ordered_dict)
 
 
 def get_ordered_dict_by_id(filename, id):
