@@ -5,12 +5,11 @@
 </head>
 <body>
     <h1>Post an answer</h1>
+    <h4><a href="/">Back to Main page</a></h4>
     <form method="post">
-    <p><strong> Question: {{ question_title }} </strong></p>
-    <p><textarea name="answer_message" rows="10" cols="70" minlength="10" required></textarea></p>
-
-    <p><input type="submit" value="Submit"></p>
-
+        <p><strong> Question: {{ question_title }} </strong></p>
+        <p><textarea name="answer_message" rows="10" cols="70" minlength="10" required></textarea></p>
+        <p><input type="submit" value="Submit"></p>
     </form>
 </body>
 </html>

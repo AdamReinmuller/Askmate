@@ -20,7 +20,6 @@ def export_csv(filename, content_dict):
         writer.writeheader()
         writer.writerows(content_dict)
 
-
 # a = import_csv('data/question.csv')
 # fn = a[0].keys()
 # print(fn)

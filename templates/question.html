@@ -2,18 +2,20 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>Details of Question {{question_id}}</title>
+        <title>Details of Question</title>
     </head>
     <body>
-        <h1>Details of Question {{question_id}}</h1>
-        <h4><a href="/list">Back to Main page</a></h4>
+        <h1>Details of Question</h1>
+        <h4><a href="/">Back to Main page</a></h4>
 	<br>
-	<table style="width:90%">
+	<table style="width:90%" border="1">
         <tr>
             {% for header in headers_q %}
                 <th>{{header}}</th>
             {% endfor %}
-            <th>Add answer</th>
+            <th>Add new answer</th>
+            <th>Delete question</th>
+            <th>Edit question</th>
         </tr>
         <tr>
             {% for key, value in question.items() %}
@@ -22,22 +24,32 @@
             <td>
                 <a href="/question/{{question['id']}}/new-answer">Add an answer</a>
             </td>
+            <td>
+                <a href="/question/{{question['id']}}/delete" onclick="return confirm('Are you sure?')">Delete question</a>
+            </td>
+            <td>
+                <a href="/question/{{question['id']}}/edit">Edit question</a>
+            </td>
         </tr>
     </table>
 
-    <p><br><br></p>
+    <p><br></p>
 
-    <table>
+    <table style="width:90%" border="1">
         <tr>
             {% for header in headers_a %}
                 <th>{{header}}</th>
             {% endfor %}
+            <th>Delete answer</th>
         </tr>
         {% for answer in answers %}
             <tr>
                 {% for item in answer %}
                     <td>{{answer[item]}}</td>
                 {% endfor %}
+                <td>
+                    <a href="/answer/{{answer['id']}}/delete" onclick="return confirm('Are you sure?')">Delete answer</a>
+                </td>
             </tr>
         {% endfor %}
 	</table>
