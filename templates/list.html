@@ -11,7 +11,7 @@
 	<table style="width:90%" border="1">
         <tr>
             {% for header in headers %}
-                <th>{{header}} <br> <a href="/">↑</a> <a href="/">↓</a></th>
+                <th>{{header}} <br> <a href="/list/?order_by={{ header }}&order_direction=asc">↑</a> <a href="/list/?order_by={{ header }}&order_direction=desc">↓</a></th>
             {% endfor %}
             <th>Add new answer</th>
             <th>Delete question</th>
