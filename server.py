@@ -1,6 +1,5 @@
 from flask import Flask, request, render_template, redirect
 import util
-import time
 import connection
 import data_manager
 
@@ -54,9 +53,21 @@ def post_answer(question_id):
 
 
 @app.route('/add-question', methods=['GET', 'POST'])
-def add_new_question():
-    if request.method == 'GET':
-        return render_template('add_questions.html')
+@app.route('/add-question/<int:question_id>', methods=['GET', 'POST'])
+def add_edit_question(question_id=-1):
+    if question_id >= 0 and request.method == 'GET':
+        question = data_manager.get_ordered_dict_by_id("data/question.csv", question_id)
+        return render_template('add_questions.html', question=question, question_id=question_id)
+
+    elif request.method == 'POST' and question_id >= 0:
+        title = request.form['question_title']
+        message = request.form['question_message']
+        data_manager.edit_line_from_csv('data/question.csv', question_id, title, message)
+        return redirect('/')
+
+    elif request.method == 'GET':
+        return render_template('add_questions.html', question_id=question_id)
+
     else:
         data_manager.add_question(request.form['question_title'], request.form['question'])
         question_id = util.get_id("data/question.csv") -1
@@ -75,13 +86,6 @@ def delete_question(question_id=None):
     data_manager.delete_line_from_csv('data/question.csv', question_id)
     answers_to_remain = data_manager.get_list_by_not_key('data/answer.csv', question_id, 'question_id')
     connection.export_csv('data/answer.csv', answers_to_remain)
-    return redirect('/list')
-
-@app.route('/question/<int:question_id>/edit')
-def edit_question(question_id=None):
-    #
-    #
-    #
     return redirect('/list')
 
 

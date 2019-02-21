@@ -65,7 +65,7 @@ def get_list_by_not_key(filename, data, key):
     :param filename: relative path
     :param data: input data
     :param key: the key of the dictionary where i searh for the data
-    :return: one ordered dict
+    :return: list of ordered dicts
     """
     result = []
     nested_ordered_dicts = connection.import_csv(filename)
@@ -91,3 +91,13 @@ def delete_line_from_csv(filename, id_):
         else:
             remaining_rows.append(row)
     connection.export_csv(filename, remaining_rows)
+
+
+def edit_line_from_csv(filename, id_, title, message):
+    nested_ordered_dicts = connection.import_csv(filename)
+    for row in nested_ordered_dicts:
+        if int(row['id']) == id_:
+            row['title'] = title
+            row['message'] = message
+            break
+    connection.export_csv(filename, nested_ordered_dicts)
