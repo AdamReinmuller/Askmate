@@ -16,6 +16,7 @@
             <th>Add new answer</th>
             <th>Delete question</th>
             <th>Edit question</th>
+            <th>Vote</th>
         </tr>
         <tr>
             {% for key, value in question.items() %}
@@ -30,6 +31,10 @@
             <td>
                 <a href="/question/{{question['id']}}/edit">Edit question</a>
             </td>
+            <td>
+                <a href="/question/{{question['id']}}/{{question['id']}}/question/up">vote up</a><br>
+                <a href="/question/{{question['id']}}/{{question['id']}}/question/down">vote down</a>
+            </td>
         </tr>
     </table>
 
@@ -41,6 +46,7 @@
                 <th>{{header}}</th>
             {% endfor %}
             <th>Delete answer</th>
+            <th>Vote</th>
         </tr>
         {% for answer in answers %}
             <tr>
@@ -49,6 +55,10 @@
                 {% endfor %}
                 <td>
                     <a href="/answer/{{answer['id']}}/delete" onclick="return confirm('Are you sure?')">Delete answer</a>
+                </td>
+                <td>
+                    <a href="/question/{{question['id']}}/{{answer['id']}}/answer/up">vote up</a><br>
+                    <a href="/question/{{question['id']}}/{{answer['id']}}/answer/down">vote down</a>
                 </td>
             </tr>
         {% endfor %}

@@ -1,6 +1,5 @@
 from flask import Flask, request, render_template, redirect
 import util
-import time
 import connection
 import data_manager
 
@@ -60,12 +59,14 @@ def delete_question(question_id=None):
     connection.export_csv('data/answer.csv', answers_to_remain)
     return redirect('/list')
 
-@app.route('/question/<int:question_id>/edit')
-def edit_question(question_id=None):
-    #
-    #
-    #
-    return redirect('/list')
+
+@app.route('/question/<int:question_id>/<int:id>/<file_>/<method>')
+def vote(question_id=None, id=None, file_=None, method=None):
+    if file_ == 'answer':
+        data_manager.change_vote_number_in_csv('data/answer.csv', id, method)
+    else:
+        data_manager.change_vote_number_in_csv('data/question.csv', id, method)
+    return redirect('/question/{}'.format(question_id))
 
 
 if __name__ == '__main__':
