@@ -2,15 +2,29 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>New Question</title>
+    <title> {{'Edit Question' if question_id >= 0 else 'Add Question'}} </title>
 </head>
 <body>
-    <h1>Add new question</h1>
-    <h4><a href="/">Back to Main page</a></h4>
-    <form method="POST" >
-        <input type="text" name="question_title" placeholder="Question title"><br>
-        <textarea name="question" placeholder="Write here your question"></textarea><br>
-        <input type="submit" value="Add question" >
-    </form>
+    <h1>{{'Edit Question' if question_id >= 0 else 'Add Question'}}</h1>
+
+    {% if question_id >= 0 %}
+        <h4><a href="/">Back to Main page</a></h4>
+        <form method="POST" >
+            <p><strong>Title:</strong></p>
+            <textarea name="question_title" rows="8" cols="30" required>{{ question['title'] }}</textarea>
+            <p><strong>Message:</strong></p>
+            <textarea name="question_message" rows="10" cols="70" required>{{ question['message'] }}</textarea><br>
+            <input type="submit" value="Edit question" >
+        </form>
+
+    {% else %}
+        <h4><a href="/">Back to Main page</a></h4>
+
+        <form method="POST" >
+            <textarea name="question_title" rows="8" cols="30" required>Question title</textarea><br>
+            <textarea name="question" rows="10" cols="70" required>Your question</textarea><br>
+            <input type="submit" value="Add question" >
+        </form>
+    {% endif %}
 </body>
 </html>

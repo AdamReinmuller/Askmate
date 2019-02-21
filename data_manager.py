@@ -93,6 +93,16 @@ def delete_line_from_csv(filename, id_):
     connection.export_csv(filename, remaining_rows)
 
 
+def edit_line_from_csv(filename, id_, title, message):
+    nested_ordered_dicts = connection.import_csv(filename)
+    for row in nested_ordered_dicts:
+        if int(row['id']) == id_:
+            row['title'] = title
+            row['message'] = message
+            break
+    connection.export_csv(filename, nested_ordered_dicts)
+
+
 def change_vote_number_in_csv(filename, id_, metod):
     nested_ordered_dicts = connection.import_csv(filename)
     for row in nested_ordered_dicts:
@@ -103,4 +113,3 @@ def change_vote_number_in_csv(filename, id_, metod):
                 row['vote_number'] = int(row['vote_number']) - 1
 
     connection.export_csv(filename, nested_ordered_dicts)
-
