@@ -1,7 +1,18 @@
 import connection
 import time
 import util
+import urllib.request
+import os
 
+
+def save_image_to_file(url, filename):
+    urllib.request.urlretrieve(url, filename)
+
+def delete_file(filename):
+    os.remove(filename)
+
+def check_file(filename):
+    return os.path.exists(filename)
 
 def add_question(form_title, form_question):
     momentary_time = round(time.time())
@@ -100,6 +111,14 @@ def edit_line_from_csv(filename, id_, title, message):
             row['title'] = title
             row['message'] = message
             break
+    connection.export_csv(filename, nested_ordered_dicts)
+
+
+def update_line_from_csv(filename, id_, key, new_data):
+    nested_ordered_dicts = connection.import_csv(filename)
+    for row in nested_ordered_dicts:
+        if int(row['id']) == id_:
+            row[key] = new_data
     connection.export_csv(filename, nested_ordered_dicts)
 
 
