@@ -1,3 +1,5 @@
+from psycopg2 import sql
+
 import connection
 import time
 import util
@@ -5,29 +7,43 @@ import urllib.request
 import os
 
 
+question_db = 'question'
+answer_db = 'answer'
+comment_db = 'comment'
+tag_db = 'tag'
+question_tag_db = 'question_tag'
+
+
+def get_table(table, key="", sort=""):
+    """
+    :key: by what fieldname you sort it
+    :sort: asc or desc
+    :return: questions in a list of ordered dictionaries
+    """
+    questions = connection.import_from_db(table)
+    if sort == 'desc':
+        try:
+            questions = sorted(questions, key=lambda x: int(x[key]), reverse=True)
+        except:
+            questions = sorted(questions, key=lambda x: x[key], reverse=True)
+    elif sort == 'asc':
+        try:
+            questions = sorted(questions, key=lambda x: int(x[key]), reverse=False)
+        except:
+            questions = sorted(questions, key=lambda x: x[key], reverse=False)
+    return questions
+
+
 def save_image_to_file(url, filename):
     urllib.request.urlretrieve(url, filename)
+
 
 def delete_file(filename):
     os.remove(filename)
 
+
 def check_file(filename):
     return os.path.exists(filename)
-
-def add_question(form_title, form_question):
-    momentary_time = round(time.time())
-    new_id = util.get_id('data/question.csv')
-    nested_ordered_dict = connection.import_csv('data/question.csv')
-    new_content = {'id': new_id,
-                   'submission_time': momentary_time,
-                   'view_number': 0,
-                   'vote_number': 0,
-                   'title': form_title,
-                   'message': form_question,
-                   'image': 'No image'
-                   }
-    nested_ordered_dict.append(new_content)
-    connection.export_csv('data/question.csv', nested_ordered_dict)
 
 
 def add_answer(question_id, form_answer):
@@ -43,6 +59,11 @@ def add_answer(question_id, form_answer):
                    }
     nested_ordered_dict.append(new_content)
     connection.export_csv('data/answer.csv', nested_ordered_dict)
+
+
+def add_question(data_dict):
+
+    connection.insert_row(question_db, data_dict)
 
 
 def get_ordered_dict_by_id(filename, id):
@@ -70,6 +91,7 @@ def get_list_by_key(filename, data, key):
         if int(row[key]) == data:
             result.append(row)
     return result
+
 
 def get_list_by_not_key(filename, data, key):
     """

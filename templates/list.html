@@ -10,12 +10,19 @@
 	<br>
 	<table style="width:90%" border="1">
         <tr>
-            {% for header in headers %}
-                <th>{{header}} <br> <a href="/list/?order_by={{ header }}&order_direction=asc">↑</a> <a href="/list/?order_by={{ header }}&order_direction=desc">↓</a></th>
-            {% endfor %}
+        <thead>
+    <tr>
+        {% for key in questions[0].keys() %}
+            <th> {{ key }} <br>
+                <a href="/?order_by={{ key }}&order_direction=asc">↑</a>
+                <a href="/?order_by={{ key }}&order_direction=desc">↓</a>
+            </th>
+        {% endfor %}
             <th>Add new answer</th>
             <th>Delete question</th>
             <th>Edit question</th>
+    </tr>
+    </thead>
         </tr>
         {% for question in questions %}
         <tr>
