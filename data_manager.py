@@ -5,7 +5,6 @@ import util
 import urllib.request
 import os
 
-
 question_db = 'question'
 answer_db = 'answer'
 comment_db = 'comment'
@@ -20,7 +19,7 @@ def get_column_names_of_table(cursor, table):
                                 FROM information_schema.columns
                                 WHERE table_name   = %(table)s
                             """,
-                              {'table': table})
+                   {'table': table})
     keys_ = cursor.fetchall()
     headers = []
     for dict in keys_:
@@ -149,6 +148,7 @@ def get_key_by_id(table, key, id):
         if int(row['id']) == int(id):
             return row[key]
 
+
 @connection.connection_handler
 def delete_answer(cursor, id_):
     cursor.execute('''
@@ -157,20 +157,22 @@ def delete_answer(cursor, id_):
     question_id = cursor.fetchall()
     cursor.execute('''
     DELETE FROM answer
-    WHERE id = %(id_)s''', {'id_':id_})
+    WHERE id = %(id_)s''', {'id_': id_})
     return question_id
+
 
 @connection.connection_handler
 def delete_question(cursor, id_):
     cursor.execute('''
     DELETE FROM question
-    WHERE id = %(id_)s''', {'id_':id_})
+    WHERE id = %(id_)s''', {'id_': id_})
+
 
 @connection.connection_handler
 def get_question_by_id(cursor, id_):
     cursor.execute('''
     SELECT * FROM question
-    WHERE id = %(id_)s''', {'id_':id_})
+    WHERE id = %(id_)s''', {'id_': id_})
     question = cursor.fetchall()
     return question
 
@@ -217,14 +219,3 @@ def change_vote_number_in_table(cursor, table, id_, method):
                                """).format(table=sql.Identifier(table)),
                        dict(id=id_)
                        )
-
-
-""" nested_ordered_dicts = import_from_db(table)
-for row in nested_ordered_dicts:
-    if int(row['id']) == int(id_):
-        if method == 'up':
-            row['vote_number'] = int(row['vote_number']) + 1
-        else:
-            row['vote_number'] = int(row['vote_number']) - 1
-
-connection.export_csv(filename, nested_ordered_dicts)"""
