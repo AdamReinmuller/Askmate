@@ -23,7 +23,10 @@ def get_column_names_of_table(cursor, table):
                             """,
                               {'table': table})
     keys_ = cursor.fetchall()
-    return keys_
+    headers = []
+    for dict in keys_:
+        headers.append(dict['column_name'])
+    return headers
 
 
 @connection.connection_handler
@@ -217,12 +220,14 @@ def change_vote_number_in_table(cursor, table, id_, method):
                                """).format(table=sql.Identifier(table)),
                        dict(id=id_)
                        )
-   """ nested_ordered_dicts = import_from_db(table)
-    for row in nested_ordered_dicts:
-        if int(row['id']) == int(id_):
-            if method == 'up':
-                row['vote_number'] = int(row['vote_number']) + 1
-            else:
-                row['vote_number'] = int(row['vote_number']) - 1
 
-    connection.export_csv(filename, nested_ordered_dicts)"""
+
+""" nested_ordered_dicts = import_from_db(table)
+for row in nested_ordered_dicts:
+    if int(row['id']) == int(id_):
+        if method == 'up':
+            row['vote_number'] = int(row['vote_number']) + 1
+        else:
+            row['vote_number'] = int(row['vote_number']) - 1
+
+connection.export_csv(filename, nested_ordered_dicts)"""
