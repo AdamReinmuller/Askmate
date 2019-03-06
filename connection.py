@@ -1,27 +1,98 @@
-import csv
+import os
+import psycopg2
+import psycopg2.extras
+from psycopg2 import sql
 
 
-def import_csv(filename):
-    with open(filename) as file:
-        csv_content = list(csv.DictReader(file))
-    return csv_content
+def get_connection_string():
+    # setup connection string
+    # to do this, please define these environment variables first
+    user_name = os.environ.get('PSQL_USER_NAME')
+    password = os.environ.get('PSQL_PASSWORD')
+    host = os.environ.get('PSQL_HOST')
+    database_name = os.environ.get('PSQL_DB_NAME')
+
+    env_variables_defined = user_name and password and host and database_name
+
+    if env_variables_defined:
+        # this string describes all info for psycopg2 to connect to the database
+        return 'postgresql://{user_name}:{password}@{host}/{database_name}'.format(
+            user_name=user_name,
+            password=password,
+            host=host,
+            database_name=database_name
+        )
+    else:
+        raise KeyError('Some necessary environment variable(s) are not defined')
 
 
-def export_csv(filename, content_dict):
-    import util
+def open_database():
+    try:
+        connection_string = get_connection_string()
+        connection = psycopg2.connect(connection_string)
+        connection.autocommit = True
+    except psycopg2.DatabaseError as exception:
+        print('Database connection problem')
+        raise exception
+    return connection
+
+
+def connection_handler(function):
+    def wrapper(*args, **kwargs):
+        connection = open_database()
+        dict_cur = connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        ret_value = function(dict_cur, *args, **kwargs)
+        dict_cur.close()
+        connection.close()
+        return ret_value
+
+    return wrapper
+
+
+@connection_handler
+def get_column_names_of_table(cursor, table):
+    cursor.execute("""
+                                SELECT column_name
+                                FROM information_schema.columns
+                                WHERE table_name   = %(table)s
+                                AND is_nullable = 'YES'
+                            """,
+                              {'table': table})
+    column_names = cursor.fetchall()
+    keys_ = collections.OrderedDict()
+    for i in column_names:
+        keys_[i['column_name']] = 'None'
+    return keys_
+
+
+@connection_handler
+def import_from_db(cursor, table):
     """
-    :param filename:
-    :param content_dict: is a list of ordered dicts
-    Beware: it deletes the content
+    :return: list of ordered dicts
     """
-    fieldnames = util.get_headers(filename)
-    with open(filename, "w") as file:
-        writer = csv.DictWriter(file, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(content_dict)
+    cursor.execute(
+        sql.SQL("SELECT * FROM {table} ").
+            format(table=sql.Identifier(table))
+    )
+    names = cursor.fetchall()
+    return names
 
-# a = import_csv('data/question.csv')
-# fn = a[0].keys()
-# print(fn)
-# export_csv('data/try.csv', a, fn)
-# print(import_csv('data/try.csv'))
+
+@connection_handler
+def insert_row(cursor, table, dict):
+    """
+    insert dict to database's table, order sensitive
+    :param table: database table name
+    :param dict: data to add
+    """
+    row_to_insert = get_column_names_of_table(table)
+    for key in dict:
+        row_to_insert[key] = dict[key]
+    insert_values = list(row_to_insert.values())
+    asd = sql.SQL(",").join(map(sql.Identifier, insert_values))
+
+    cursor.execute(
+        sql.SQL("INSERT INTO {table} VALUES {data};").
+            format(data=asd,
+                   table=sql.Identifier(table))
+    )
