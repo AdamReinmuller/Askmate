@@ -12,3 +12,5 @@ def get_last_question_id(cursor):
 def get_time():
     dt = datetime.now()
     return dt
+if __name__ == '__main__':
+    print(get_last_question_id())
