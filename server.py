@@ -8,9 +8,8 @@ app = Flask(__name__)
 @app.route('/')
 @app.route('/list')
 def route_list():
-    questions = sorted(connection.import_csv('data/question.csv'), key=lambda k: int(k['id']), reverse=True)
-    headers = util.get_headers('data/question.csv')
-
+    questions = sorted(data_manager.import_from_db(data_manager.question_db), key=lambda k: int(k['id']), reverse=True)
+    headers = data_manager.get_column_names_of_table(data_manager.question_db)
     return render_template('list.html', questions=questions, headers=headers)
 
 
@@ -70,22 +69,19 @@ def add_edit_question(question_id=-1):
 
     else:
         data_manager.add_question(request.form['question_title'], request.form['question'])
-        question_id = util.get_id("data/question.csv") -1
+        question_id = util.get_last_question_id()
         return redirect('/question/{}'.format(question_id))
 
 
 @app.route('/answer/<answer_id>/delete')
 def delete_answer(answer_id=None):
-    question_id = data_manager.get_key_by_id('data/answer.csv', 'question_id', answer_id)
-    data_manager.delete_line_from_csv('data/answer.csv', answer_id)
+    question_id = data_manager.delete_answer(answer_id)
     return redirect('/question/{}'.format(question_id))
 
 
 @app.route('/question/<int:question_id>/delete')
 def delete_question(question_id=None):
-    data_manager.delete_line_from_csv('data/question.csv', question_id)
-    answers_to_remain = data_manager.get_list_by_not_key('data/answer.csv', question_id, 'question_id')
-    connection.export_csv('data/answer.csv', answers_to_remain)
+    data_manager.delete_question(question_id)
     return redirect('/list')
 
 

@@ -22,10 +22,7 @@ def get_column_names_of_table(cursor, table):
                                 AND is_nullable = 'YES'
                             """,
                               {'table': table})
-    column_names = cursor.fetchall()
-    keys_ = collections.OrderedDict()
-    for i in column_names:
-        keys_[i['column_name']] = 'None'
+    keys_ = cursor.fetchall()
     return keys_
 
 
@@ -150,16 +147,22 @@ def get_key_by_id(table, key, id):
         if int(row['id']) == int(id):
             return row[key]
 
+@connection.connection_handler
+def delete_answer(cursor, id_):
+    cursor.execute('''
+        SELECT id FROM question
+        WHERE id = %(id_)s''', {'id_': id_})
+    question_id = cursor.fetchall()
+    cursor.execute('''
+    DELETE FROM answer
+    WHERE id = %(id_)s''', {'id_':id_})
+    return question_id
 
-def delete_line_from_csv(filename, id_):
-    nested_ordered_dicts = connection.import_csv(filename)
-    remaining_rows = []
-    for row in nested_ordered_dicts:
-        if int(row['id']) == int(id_):
-            pass
-        else:
-            remaining_rows.append(row)
-    connection.export_csv(filename, remaining_rows)
+@connection.connection_handler
+def delete_question(cursor, id_):
+    cursor.execute('''
+    DELETE FROM question
+    WHERE id = %(id_)s''', {'id_':id_})
 
 
 def edit_line_from_csv(filename, id_, title, message):
