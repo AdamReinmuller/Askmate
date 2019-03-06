@@ -172,21 +172,54 @@ def edit_line_from_csv(filename, id_, title, message):
     connection.export_csv(filename, nested_ordered_dicts)
 
 
-def update_line_from_csv(filename, id_, key, new_data):
-    nested_ordered_dicts = connection.import_csv(filename)
-    for row in nested_ordered_dicts:
-        if int(row['id']) == id_:
-            row[key] = new_data
-    connection.export_csv(filename, nested_ordered_dicts)
+@connection.connection_handler
+def update_question(cursor, id_, title, message):
+    cursor.execute("""UPDATE question
+                      SET message = %(message)s
+                          title = %(title)s
+                      WHERE id = %(id_)s
+                        """,
+                   dict(id_=id_, title=title, message=message)
+                   )
 
 
-def change_vote_number_in_csv(filename, id_, metod):
-    nested_ordered_dicts = connection.import_csv(filename)
+@connection.connection_handler
+def update_answer(cursor, id_, message):
+    cursor.execute("""UPDATE answer
+                      SET message = %(message)s
+                      WHERE id = %(id_)s
+                        """,
+                   dict(id_=id_, message=message)
+                   )
+
+
+@connection.connection_handler
+def change_vote_number_in_table(cursor, table, id_, method):
+    """
+    changes the vote number in question or answer db
+    """
+    if method == 'up':
+        cursor.execute(sql.SQL("""
+                            UPDATE{table}
+                            SET vote_number = vote_number+1
+                            WHERE id = %(id)s;
+                           """).format(table=sql.Identifier(table)),
+                       dict(id=id_)
+                       )
+    elif method == 'down':
+        cursor.execute(sql.SQL("""
+                                UPDATE{table}
+                                SET vote_number = vote_number-1
+                                WHERE id = %(id)s;
+                               """).format(table=sql.Identifier(table)),
+                       dict(id=id_)
+                       )
+   """ nested_ordered_dicts = import_from_db(table)
     for row in nested_ordered_dicts:
         if int(row['id']) == int(id_):
-            if metod == 'up':
+            if method == 'up':
                 row['vote_number'] = int(row['vote_number']) + 1
             else:
                 row['vote_number'] = int(row['vote_number']) - 1
 
-    connection.export_csv(filename, nested_ordered_dicts)
+    connection.export_csv(filename, nested_ordered_dicts)"""
