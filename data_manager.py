@@ -19,7 +19,6 @@ def get_column_names_of_table(cursor, table):
                                 SELECT column_name
                                 FROM information_schema.columns
                                 WHERE table_name   = %(table)s
-                                AND is_nullable = 'YES'
                             """,
                               {'table': table})
     keys_ = cursor.fetchall()
@@ -167,21 +166,19 @@ def delete_question(cursor, id_):
     DELETE FROM question
     WHERE id = %(id_)s''', {'id_':id_})
 
-
-def edit_line_from_csv(filename, id_, title, message):
-    nested_ordered_dicts = connection.import_csv(filename)
-    for row in nested_ordered_dicts:
-        if int(row['id']) == id_:
-            row['title'] = title
-            row['message'] = message
-            break
-    connection.export_csv(filename, nested_ordered_dicts)
+@connection.connection_handler
+def get_question_by_id(cursor, id_):
+    cursor.execute('''
+    SELECT * FROM question
+    WHERE id = %(id_)s''', {'id_':id_})
+    question = cursor.fetchall()
+    return question
 
 
 @connection.connection_handler
 def update_question(cursor, id_, title, message):
     cursor.execute("""UPDATE question
-                      SET message = %(message)s
+                      SET message = %(message)s,
                           title = %(title)s
                       WHERE id = %(id_)s
                         """,
@@ -192,7 +189,7 @@ def update_question(cursor, id_, title, message):
 @connection.connection_handler
 def update_answer(cursor, id_, message):
     cursor.execute("""UPDATE answer
-                      SET message = %(message)s
+                      SET message = %(message)s,
                       WHERE id = %(id_)s
                         """,
                    dict(id_=id_, message=message)

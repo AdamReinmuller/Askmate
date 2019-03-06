@@ -5,8 +5,8 @@ import connection
 def get_last_question_id(cursor):
     cursor.execute('''
     SELECT id FROM question ORDER BY ID DESC LIMIT 1''')
-    last_question_id = cursor.fetchall()
-    return last_question_id
+    last_question_id = cursor.fetchone()
+    return last_question_id['id']
 
 
 def get_time():

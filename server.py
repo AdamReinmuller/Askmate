@@ -53,15 +53,15 @@ def post_answer(question_id):
 
 @app.route('/add-question', methods=['GET', 'POST'])
 @app.route('/add-question/<int:question_id>', methods=['GET', 'POST'])
-def add_edit_question(question_id=-1):
-    if question_id >= 0 and request.method == 'GET':
-        question = data_manager.get_ordered_dict_by_id("data/question.csv", question_id)
+def add_edit_question(question_id=None):
+    if question_id and request.method == 'GET':
+        question = data_manager.get_ordered_dict_by_id(data_manager.question_db, int(question_id))
         return render_template('add_questions.html', question=question, question_id=question_id)
 
-    elif request.method == 'POST' and question_id >= 0:
+    elif request.method == 'POST' and question_id:
         title = request.form['question_title']
         message = request.form['question_message']
-        data_manager.edit_line_from_csv('data/question.csv', question_id, title, message)
+        data_manager.update_question(question_id, title, message)
         return redirect('/')
 
     elif request.method == 'GET':
