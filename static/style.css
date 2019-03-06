@@ -1,0 +1,13 @@
+body {
+    font-size: 14px;
+    color: #4e51d3;
+    background-color: #3b666b;
+}
+
+h1 {
+    border-style: dashed;
+    border-width: 3px;
+    border-left-width: 10px;
+    border-right-width: 10px;
+    border-color: #cdf46c;
+}
