@@ -1,32 +1,19 @@
 from flask import Flask, request, render_template, redirect
 import util
-import connection
 import data_manager
 
 app = Flask(__name__)
 
+
 @app.route('/')
 @app.route('/list')
-def route_list():
-    questions = sorted(data_manager.import_from_db(data_manager.question_db), key=lambda k: int(k['id']), reverse=True)
-    headers = data_manager.get_column_names_of_table(data_manager.question_db)
-    return render_template('list.html', questions=questions, headers=headers)
-
-
 @app.route('/list/')
-def route_sorted_list():
-    try:
-        if request.args['order_direction'] == 'desc':
-            questions = sorted(connection.import_csv('data/question.csv'), key=lambda k: int(k[request.args['order_by']]), reverse=True)
-        else:
-            questions = sorted(connection.import_csv('data/question.csv'), key=lambda k: int(k[request.args['order_by']]), reverse=False)
-    except:
-        if request.args['order_direction'] == 'desc':
-            questions = sorted(connection.import_csv('data/question.csv'), key=lambda k: k[request.args['order_by']], reverse=True)
-        else:
-            questions = sorted(connection.import_csv('data/question.csv'), key=lambda k: k[request.args['order_by']], reverse=False)
-    headers = util.get_headers('data/question.csv')
-
+def route_list():
+    questions = data_manager.import_from_db(data_manager.question_db)
+    headers = data_manager.get_column_names_of_table(data_manager.question_db)
+    if request.args:
+        questions = data_manager.sort_table(data_manager.question_db, request.args['order_by'],
+                                            request.args['order_direction'])
     return render_template('list.html', questions=questions, headers=headers)
 
 
@@ -39,10 +26,11 @@ def route_question(question_id):
     return render_template('question.html', question=question, headers_q=headers_q, answers=answers,
                            headers_a=headers_a)
 
+
 @app.route('/question/<int:question_id>/new-answer', methods=['GET', 'POST'])
 def post_answer(question_id):
     if request.method == 'GET':
-        single_question = data_manager.get_ordered_dict_by_id('data/question.csv', int(question_id))
+        single_question = data_manager.get_ordered_dict_by_id(data_manager.answer_db, int(question_id))
         question_title = single_question['title']
         return render_template('post-answer.html', question_title=question_title)
     elif request.method == 'POST':
