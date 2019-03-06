@@ -19,7 +19,6 @@ def get_column_names_of_table(cursor, table):
                                 SELECT column_name
                                 FROM information_schema.columns
                                 WHERE table_name   = %(table)s
-                                AND is_nullable = 'YES'
                             """,
                               {'table': table})
     keys_ = cursor.fetchall()
