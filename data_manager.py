@@ -1,5 +1,6 @@
+import collections
+from psycopg2 import sql
 import connection
-import time
 import util
 import urllib.request
 import os
@@ -12,13 +13,42 @@ tag_db = 'tag'
 question_tag_db = 'question_tag'
 
 
-def get_table(table, key="", sort=""):
+@connection.connection_handler
+def get_column_names_of_table(cursor, table):
+    cursor.execute("""
+                                SELECT column_name
+                                FROM information_schema.columns
+                                WHERE table_name   = %(table)s
+                                AND is_nullable = 'YES'
+                            """,
+                              {'table': table})
+    column_names = cursor.fetchall()
+    keys_ = collections.OrderedDict()
+    for i in column_names:
+        keys_[i['column_name']] = 'None'
+    return keys_
+
+
+@connection.connection_handler
+def import_from_db(cursor, table):
+    """
+    :return: list of ordered dicts
+    """
+    cursor.execute(
+        sql.SQL("SELECT * FROM {table} ").
+            format(table=sql.Identifier(table))
+    )
+    names = cursor.fetchall()
+    return names
+
+
+def sort_table(table, key="", sort=""):
     """
     :key: by what fieldname you sort it
     :sort: asc or desc
     :return: questions in a list of ordered dictionaries
     """
-    questions = connection.import_from_db(table)
+    questions = import_from_db(table)
     if sort == 'desc':
         try:
             questions = sorted(questions, key=lambda x: int(x[key]), reverse=True)
@@ -78,7 +108,7 @@ def get_ordered_dict_by_id(table, id):
     :param id: input id as integer
     :return: one ordered dict
     """
-    nested_ordered_dicts = connection.import_from_db(table)
+    nested_ordered_dicts = import_from_db(table)
     for row in nested_ordered_dicts:
         if int(row['id']) == id:
             return row
@@ -92,7 +122,7 @@ def get_list_by_key(table, data, key):
     :return: one ordered dict
     """
     result = []
-    nested_ordered_dicts = connection.import_from_db(table)
+    nested_ordered_dicts = import_from_db(table)
     for row in nested_ordered_dicts:
         if int(row[key]) == data:
             result.append(row)
@@ -107,7 +137,7 @@ def get_list_by_not_key(table, data, key):
     :return: one ordered dict
     """
     result = []
-    nested_ordered_dicts = connection.import_from_db(table)
+    nested_ordered_dicts = import_from_db(table)
     for row in nested_ordered_dicts:
         if int(row[key]) != data:
             result.append(row)
@@ -115,7 +145,7 @@ def get_list_by_not_key(table, data, key):
 
 
 def get_key_by_id(table, key, id):
-    nested_ordered_dicts = connection.import_from_db(table)
+    nested_ordered_dicts = import_from_db(table)
     for row in nested_ordered_dicts:
         if int(row['id']) == int(id):
             return row[key]

@@ -50,35 +50,6 @@ def connection_handler(function):
 
 
 @connection_handler
-def get_column_names_of_table(cursor, table):
-    cursor.execute("""
-                                SELECT column_name
-                                FROM information_schema.columns
-                                WHERE table_name   = %(table)s
-                                AND is_nullable = 'YES'
-                            """,
-                              {'table': table})
-    column_names = cursor.fetchall()
-    keys_ = collections.OrderedDict()
-    for i in column_names:
-        keys_[i['column_name']] = 'None'
-    return keys_
-
-
-@connection_handler
-def import_from_db(cursor, table):
-    """
-    :return: list of ordered dicts
-    """
-    cursor.execute(
-        sql.SQL("SELECT * FROM {table} ").
-            format(table=sql.Identifier(table))
-    )
-    names = cursor.fetchall()
-    return names
-
-
-@connection_handler
 def insert_row(cursor, table, dict):
     """
     insert dict to database's table, order sensitive
