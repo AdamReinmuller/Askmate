@@ -1,3 +1,7 @@
-body {
-    background-color: #a97f44;
+.search_phrase {
+    color: #ff5658;
+    text-decoration: underline;
+}
+#answer_col {
+    background: deepskyblue;
 }

@@ -3,10 +3,12 @@
     <head>
         <meta charset="utf-8">
         <title>Search Results</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     </head>
     <body>
         <h1>Search Results</h1>
         <h4><a href="/">Homepage</a></h4>
+        <p>Search phrase: <span class="search_phrase">{{search_phrase}}</span></p>
     <br>
     {% if questions|length > 0 %}
     <table style="width:90%" border="1">
@@ -22,9 +24,13 @@
         <tr>
                 {% for key, value in question.items() %}
                     {% if key == 'title' %}
-                        <td><a href="/question/{{question['id']}}">{{ value }}</a></td>
+                        <td><a href="/question/{{question['id']}}">{{ value.replace(search_phrase, '<span class="search_phrase">' + search_phrase + '</span>')|safe }}</a></td>
                     {% else %}
-                        <td>{{value}}</td>
+                        {% if key == 'message' %}
+                            <td>{{value.replace(search_phrase, '<span class="search_phrase">' + search_phrase + '</span>')|safe}}</td>
+                        {% else %}
+                            <td> {{ value }} </td>
+                        {% endif %}
                     {% endif %}
                 {% endfor %}
                 <td>
@@ -39,12 +45,12 @@
         </tr>
         {% for answer in answers %}
             {% if answer['question_id'] == question['id'] %}
-                <div class="related_answer">
                     <tr>
-                        <td colspan="5"> <strong>Answer: </strong> </td>
-                        <td> {{answer['message']}} </td>
+                        <td id="answer_col" colspan="5"> Answer: </td>
+                        <td>
+                        {{ answer['message'].replace(search_phrase, '<span class="search_phrase">' + search_phrase + '</span>')|safe }}
+                        </td>
                     </tr>
-                </div>
             {% endif %}
         {% endfor %}
 

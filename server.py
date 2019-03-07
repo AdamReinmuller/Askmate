@@ -191,7 +191,8 @@ def search():
     headers = data_manager.get_column_names_of_table(data_manager.question_db)
     questions = data_manager.search(search_phrase)
     answers = data_manager.search_answers(search_phrase)
-    return render_template('search_results.html', questions=questions, answers=answers, headers=headers)
+    return render_template('search_results.html', questions=questions, answers=answers,
+                           headers=headers, search_phrase=search_phrase)
 
 
 if __name__ == '__main__':

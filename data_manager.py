@@ -268,9 +268,9 @@ def search(cursor, search_phrase):
                     FROM question
                     FULL JOIN answer
                     ON question.id = answer.question_id
-                    WHERE question.message LIKE %(search_phrase)s OR
-                          question.title LIKE %(search_phrase)s OR
-                          answer.message LIKE %(search_phrase)s
+                    WHERE question.message ILIKE %(search_phrase)s OR
+                          question.title ILIKE %(search_phrase)s OR
+                          answer.message ILIKE %(search_phrase)s
                 ''', dict(search_phrase='%' + search_phrase + '%'))
     questions = cursor.fetchall()
     return questions
@@ -283,7 +283,7 @@ def search_answers(cursor, search_phrase):
     """
     cursor.execute('''
         SELECT question_id, message FROM answer
-        WHERE message LIKE %(search_phrase)s
+        WHERE message ILIKE %(search_phrase)s
                     ''', dict(search_phrase='%' + search_phrase + '%'))
     answers = cursor.fetchall()
     return answers
