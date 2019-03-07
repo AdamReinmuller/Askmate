@@ -316,3 +316,13 @@ def update_comment_message_submt_editedc_by_id(cursor, id, message, submission_t
                             WHERE id = %(id)s;
                            """).format(message=sql.Identifier(message), submission_time=sql.Identifier(str(submission_time))),
                            {'message': message, 'submission_time': submission_time, 'id': id})
+
+
+@connection.connection_handler
+def get_headers(cursor, table):
+    cursor.execute(sql.SQL("""
+                    SELECT * FROM {table};
+                   """).format(table=sql.Identifier(table)))
+    one_line_from_table_to_get_keys = cursor.fetchone()
+    headers = util.get_headers(one_line_from_table_to_get_keys)
+    return headers

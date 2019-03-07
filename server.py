@@ -30,7 +30,7 @@ def add_comment_to_question(question_id, comment=None, comment_id=-1):
         return render_template('comment.html', question_title=question_title, comment=comment, comment_id=comment_id)
 
     elif request.method == 'POST':
-        data_manager.add_comment_to_table('comment', 'question_id', question_id, request.form['comment'], util.submission_time(), 0)
+        data_manager.add_comment_to_table('comment', 'question_id', question_id, request.form['comment'], util.get_time(), 0)
         return redirect('/question/{}'.format(question_id))
 
 
@@ -42,7 +42,7 @@ def add_comment_to_answer(answer_id, comment=None, comment_id=-1):
 
     elif request.method == 'POST':
         question_id = data_manager.get_foreign_key_by_id('answer', 'question_id', answer_id)[0]['question_id']
-        data_manager.add_comment_to_table('comment', 'answer_id', answer_id, request.form['comment'], util.submission_time(), 0)
+        data_manager.add_comment_to_table('comment', 'answer_id', answer_id, request.form['comment'], util.get_time(), 0)
         return redirect('/question/{}'.format(question_id))
 
 @app.route('/comments/<int:comment_id>/delete')
@@ -68,7 +68,7 @@ def edit_comment(comment_id):
             question_id = data_manager.get_foreign_key_by_id('answer', 'question_id', answer_id)[0]['question_id']
         else:
             question_id = data_manager.get_foreign_key_by_id('comment', 'question_id', comment_id)[0]['question_id']
-        data_manager.update_comment_message_submt_editedc_by_id(comment_id, request.form['comment'], util.submission_time())
+        data_manager.update_comment_message_submt_editedc_by_id(comment_id, request.form['comment'], util.get_time())
         return redirect('/question/{}'.format(question_id))
 
 
