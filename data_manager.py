@@ -242,10 +242,10 @@ def search(cursor, search_phrase):
 @connection.connection_handler
 def search_answers(cursor, search_phrase):
     """
-    :return: rows in answer db with the column:message
+    :return: rows in answer db with the column:message, question_id
     """
     cursor.execute('''
-        SELECT message FROM answer
+        SELECT question_id, message FROM answer
         WHERE message LIKE %(search_phrase)s
                     ''', dict(search_phrase='%' + search_phrase + '%'))
     answers = cursor.fetchall()
