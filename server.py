@@ -179,9 +179,9 @@ def delete_question(question_id=None):
 @app.route('/question/<int:question_id>/<int:id>/<file_>/<method>')
 def vote(question_id=None, id=None, file_=None, method=None):
     if file_ == 'answer':
-        data_manager.change_vote_number_in_table('data/answer.csv', id, method)
+        data_manager.change_vote_number_in_table(data_manager.answer_db, id, method)
     else:
-        data_manager.change_vote_number_in_table('data/question.csv', id, method)
+        data_manager.change_vote_number_in_table(data_manager.question_db, id, method)
     return redirect('/question/{}'.format(question_id))
 
 

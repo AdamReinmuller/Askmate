@@ -6,16 +6,16 @@
                 answer</a>
         </td>
         <td>
-            <a href="/add-question/{{ answer_id }}">Edit answer</a>
+            <a href="/add-question/{{ answer['id'] }}">Edit answer</a>
         </td>
         <td>
-            <a href="/question/{{ question_id }}/{{ answer_id }}/question/up">
+            <a href="/question/{{ question_id }}/{{ answer['id'] }}/answer/up">
                 <img src='{{ url_for('static', filename='voteup.png') }}' alt="here should be vote up image"
                      width="40" height="40">
             </a><br>
         </td>
         <td>
-            <a href="/question/{{ question_id }}/{{ answer_id }}/question/down">
+            <a href="/question/{{ question_id }}/{{ answer['id'] }}/answer/down">
                 <img src='{{ url_for('static', filename='votedown.png') }}' alt="here should be vote down image"
                      width="40" height="40">
             </a><br>
