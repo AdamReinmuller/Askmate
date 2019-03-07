@@ -219,3 +219,34 @@ def change_vote_number_in_table(cursor, table, id_, method):
                                """).format(table=sql.Identifier(table)),
                        dict(id=id_)
                        )
+
+
+@connection.connection_handler
+def search(cursor, search_phrase):
+    """
+    :return: rows in the question_db and the correlated answer_db where the search_phrase is found
+    """
+    cursor.execute('''
+                    SELECT question.*
+                    FROM question
+                    inner join answer
+                    ON question.id = answer.question_id
+                    WHERE question.message LIKE %(search_phrase)s OR
+                          question.title LIKE %(search_phrase)s OR
+                          answer.message LIKE %(search_phrase)s
+                ''', dict(search_phrase='%' + search_phrase + '%'))
+    questions = cursor.fetchall()
+    return questions
+
+
+@connection.connection_handler
+def search_answers(cursor, search_phrase):
+    """
+    :return: rows in answer db with the column:message
+    """
+    cursor.execute('''
+        SELECT message FROM answer
+        WHERE message LIKE %(search_phrase)s
+                    ''', dict(search_phrase='%' + search_phrase + '%'))
+    answers = cursor.fetchall()
+    return answers
