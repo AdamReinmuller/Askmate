@@ -226,7 +226,7 @@ def search(cursor, search_phrase):
     :return: rows in the question_db and the correlated answer_db where the search_phrase is found
     """
     cursor.execute('''
-                    SELECT question.*
+                    SELECT DISTINCT question.*
                     FROM question
                     FULL JOIN answer
                     ON question.id = answer.question_id
