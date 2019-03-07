@@ -1,6 +1,9 @@
+import collections
 from psycopg2 import sql
 import connection
 import util
+import urllib.request
+import os
 
 question_db = 'question'
 answer_db = 'answer'
@@ -55,6 +58,18 @@ def sort_table(table, key="", sort=""):
         except:
             questions = sorted(questions, key=lambda x: x[key], reverse=False)
     return questions
+
+
+def save_image_to_file(url, filename):
+    urllib.request.urlretrieve(url, filename)
+
+
+def delete_file(filename):
+    os.remove(filename)
+
+
+def check_file(filename):
+    return os.path.exists(filename)
 
 
 @connection.connection_handler
@@ -316,3 +331,4 @@ def update_comment_message_submt_editedc_by_id(cursor, id, message, submission_t
                             WHERE id = %(id)s;
                            """).format(message=sql.Identifier(message), submission_time=sql.Identifier(str(submission_time))),
                            {'message': message, 'submission_time': submission_time, 'id': id})
+
