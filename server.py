@@ -6,6 +6,12 @@ app = Flask(__name__)
 
 
 @app.route('/')
+def index():
+    questions = data_manager.sort_table(data_manager.question_db, 'id', 'desc')
+    header = data_manager.get_column_names_of_table(data_manager.question_db)
+    return render_template('index.html', questions=questions, header=header)
+
+
 @app.route('/list')
 @app.route('/list/')
 def route_list():
@@ -80,6 +86,15 @@ def vote(question_id=None, id=None, file_=None, method=None):
     else:
         data_manager.change_vote_number_in_table('data/question.csv', id, method)
     return redirect('/question/{}'.format(question_id))
+
+
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+    search_phrase = request.form['search_phrase']
+    headers = data_manager.get_column_names_of_table(data_manager.question_db)
+    questions = data_manager.search(search_phrase)
+    answers = data_manager.search_answers(search_phrase)
+    return render_template('search_results.html', questions=questions, answers=answers, headers=headers)
 
 
 if __name__ == '__main__':
