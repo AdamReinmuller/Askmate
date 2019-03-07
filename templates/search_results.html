@@ -17,7 +17,7 @@
             <th>Delete question</th>
             <th>Edit question</th>
         </tr>
-        {% for question in questions %}
+    {% for question in questions %}
         <tr>
                 {% for key, value in question.items() %}
                     {% if key == 'title' %}
@@ -36,7 +36,18 @@
                     <a href="/add-question/{{question['id']}}">Edit question</a>
                 </td>
         </tr>
+        {% for answer in answers %}
+            {% if answer['question_id'] == question['id'] %}
+                <div class="related_answer">
+                    <tr>
+                        <td colspan="5"> <strong>Answer: </strong> </td>
+                        <td> {{answer['message']}} </td>
+                    </tr>
+                </div>
+            {% endif %}
         {% endfor %}
+
+    {% endfor %}
     </table>
     </body>
 </html>
