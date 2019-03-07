@@ -1,0 +1,37 @@
+<question_buttons>
+<table align="center" cellpadding="40">
+    <tr>
+        <td>
+            <a href="/question/{{ question_id }}/new-answer">Add an answer</a>
+        </td>
+        <td>
+            <a href="/question/{{ question_id }}/delete" onclick="return confirm('Are you sure?')">Delete
+                question</a>
+        </td>
+        <td>
+            <a href="/add-question/{{ question_id }}">Edit question</a>
+        </td>
+        <td>
+            <a href="/question/{{ question_id }}/{{ question_id }}/question/up">
+                <img src='{{ url_for('static', filename='voteup.png') }}' alt="here should be vote up image"
+                     width="40" height="40">
+            </a><br>
+        </td>
+        <td>
+            <a href="/question/{{ question_id }}/{{ question_id }}/question/down">
+                <img src='{{ url_for('static', filename='votedown.png') }}' alt="here should be vote down image"
+                     width="40" height="40">
+            </a><br>
+        </td>
+        <td>
+            <a href="/question/{{ question_id }}/new-comment">Add comment</a><br>
+        </td>
+        <td>
+            <a href="/question/{{ question_id }}/add-tag">Add tag</a><br>
+        </td>
+        <td>
+            <a href="/question/{{ question_id }}/delete-tag">Delete tag</a><br>
+        </td>
+    </tr>
+</table>
+</question_buttons>

@@ -81,7 +81,7 @@ def add_question(cursor, title, message):
     current_time = util.get_time()
     cursor.execute("""INSERT INTO question
                       (submission_time, view_number, vote_number, title, message, image)
-                      VALUES ( %(submission_time)s, 0, 0, %(title)s, %(message)s, 'no image' );
+                      VALUES ( %(submission_time)s, 0, 0, %(title)s, %(message)s, 'no image' )
                     """,
                    dict(submission_time=current_time, title=title, message=message)
                    )
@@ -251,15 +251,123 @@ def delete_tag(cursor, question_id):
                    {'question_id': question_id, 'tag_id': tag_id})
 
 
-""" nested_ordered_dicts = import_from_db(table)
-for row in nested_ordered_dicts:
-    if int(row['id']) == int(id_):
-        if method == 'up':
-            row['vote_number'] = int(row['vote_number']) + 1
-        else:
-            row['vote_number'] = int(row['vote_number']) - 1
+@connection.connection_handler
+def search(cursor, search_phrase):
+    """
+    :return: rows in the question_db and the correlated answer_db where the search_phrase is found
+    """
+    cursor.execute('''
+                    SELECT DISTINCT question.*
+                    FROM question
+                    FULL JOIN answer
+                    ON question.id = answer.question_id
+                    WHERE question.message LIKE %(search_phrase)s OR
+                          question.title LIKE %(search_phrase)s OR
+                          answer.message LIKE %(search_phrase)s
+                ''', dict(search_phrase='%' + search_phrase + '%'))
+    questions = cursor.fetchall()
+    return questions
 
-connection.export_csv(filename, nested_ordered_dicts)"""
 
-# @connection.connection_handler
-# def delete_tag():
+@connection.connection_handler
+def search_answers(cursor, search_phrase):
+    """
+    :return: rows in answer db with the column:message, question_id
+    """
+    cursor.execute('''
+        SELECT question_id, message FROM answer
+        WHERE message LIKE %(search_phrase)s
+                    ''', dict(search_phrase='%' + search_phrase + '%'))
+    answers = cursor.fetchall()
+    return answers
+
+
+
+#zsuzsi
+
+
+@connection.connection_handler
+def get_line_title_by_id(cursor, table, id):
+    cursor.execute(sql.SQL("""
+                    SELECT title FROM {table}
+                    WHERE id = %(id)s
+                   """).format(table=sql.Identifier(table)), {'id': id})
+    title = cursor.fetchall()
+    return title
+
+@connection.connection_handler
+def get_foreign_key_by_id(cursor, table, foreign_key_name, id):
+    cursor.execute(sql.SQL("""
+                    SELECT {foreign_key_name} FROM {table}
+                    WHERE id = %(id)s
+                   """).format(table=sql.Identifier(table), foreign_key_name=sql.Identifier(foreign_key_name)), {'id': id})
+    title = cursor.fetchall()
+    return title
+
+
+@connection.connection_handler
+def get_line_data_by_id(cursor, table, id):
+    cursor.execute(sql.SQL("""
+                    SELECT * FROM {table}
+                    WHERE id = %(id)s
+                    ORDER BY submission_time DESC;
+                   """).format(table=sql.Identifier(table)), {'id': id})
+    line_data = cursor.fetchall()
+    return line_data
+
+
+@connection.connection_handler
+def get_comments_data_by_foreign_id(cursor, foreign_id_name, id):
+    cursor.execute(sql.SQL("""
+                    SELECT id, message, submission_time, edited_count FROM comment
+                    WHERE {foreign_id_name} = %(id)s
+                    ORDER BY submission_time DESC;
+                   """).format(foreign_id_name=sql.Identifier(foreign_id_name)), {'id': id})
+    comments_data = cursor.fetchall()
+    return comments_data
+
+@connection.connection_handler
+def get_lines_data_by_foreign_id(cursor, table, foreign_id_name, id):
+    cursor.execute(sql.SQL("""
+                    SELECT * FROM {table}
+                    WHERE {foreign_id_name} = %(id)s
+                    ORDER BY submission_time DESC;
+                   """).format(table=sql.Identifier(table), foreign_id_name=sql.Identifier(foreign_id_name)), {'id': id})
+    lines_data = cursor.fetchall()
+    return lines_data
+
+@connection.connection_handler
+def add_comment_to_table(cursor, table, id_type, id, message, submission_time, edited_count):
+    cursor.execute(sql.SQL("""
+                    INSERT INTO {table} ({id_type}, message, submission_time, edited_count)
+                    VALUES (%(id)s, %(message)s, %(submission_time)s, %(edited_count)s)
+                   """).format(table=sql.Identifier(table), id_type=sql.Identifier(id_type)),
+                   {'id': id, 'message': message, 'submission_time': submission_time, 'edited_count': edited_count})
+
+@connection.connection_handler
+def delete_line_by_id(cursor, table, id):
+ cursor.execute(sql.SQL("""
+                            DELETE FROM {table}
+                            WHERE id = %(id)s;
+                           """).format(table=sql.Identifier(table)),
+                           {'id': id})
+
+
+@connection.connection_handler
+def update_comment_message_submt_editedc_by_id(cursor, id, message, submission_time):
+ cursor.execute(sql.SQL("""
+                            UPDATE comment
+                            SET edited_count = edited_count+1, message=%(message)s , submission_time=%(submission_time)s
+                            WHERE id = %(id)s;
+                           """).format(message=sql.Identifier(message), submission_time=sql.Identifier(str(submission_time))),
+                           {'message': message, 'submission_time': submission_time, 'id': id})
+
+
+@connection.connection_handler
+def get_headers(cursor, table):
+    cursor.execute(sql.SQL("""
+                    SELECT * FROM {table};
+                   """).format(table=sql.Identifier(table)))
+    one_line_from_table_to_get_keys = cursor.fetchone()
+    headers = util.get_headers(one_line_from_table_to_get_keys)
+    return headers
