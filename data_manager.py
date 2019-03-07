@@ -218,23 +218,38 @@ def change_vote_number_in_table(cursor, table, id_, method):
 
 @connection.connection_handler
 def add_tag_to_question(cursor, question_id, tag):
-    cursor.execute('''INSERT INTO tag (name) VALUES (%(tag)s)''', {'tag': tag})
-    cursor.execute('''SELECT id FROM tag
-    WHERE name = (%(tag)s)''', {'tag': tag})
-    tag_id = cursor.fetchone()['id']
-    cursor.execute('''
-                      INSERT INTO question_tag
-                      VALUES (%(question_id)s, %(tag_id)s)
-                      '''
-                   , {'question_id': question_id, 'tag_id': tag_id})
+    cursor.execute('''SELECT * FROM tag
+                    WHERE name = %(tag)s''', {'tag':tag})
+    on_the_table = cursor.fetchall()
+    if not on_the_table:
+        cursor.execute('''INSERT INTO tag (name) VALUES (%(tag)s);
+                          SELECT id FROM tag
+                          WHERE name = (%(tag)s)''', {'tag': tag})
+        tag_id = cursor.fetchone()['id']
+        cursor.execute('''
+                          INSERT INTO question_tag
+                          VALUES (%(question_id)s, %(tag_id)s)
+                          '''
+                       , {'question_id': question_id, 'tag_id': tag_id})
+    elif on_the_table:
+        cursor.execute('''SELECT id FROM tag
+        WHERE name = %(tag)s''', {'tag':tag})
+        tag_id = cursor.fetchone()['id']
+        cursor.execute('''SELECT * FROM question_tag
+                          WHERE tag_id=%(tag_id)s AND question_id=%(question_id)s''',
+                          {'question_id':question_id, 'tag_id':tag_id})
+        existing_question_tag_connection = cursor.fetchall()
+        if not existing_question_tag_connection:
+            cursor.execute('''INSERT INTO question_tag
+                              VALUES (%(question_id)s, %(tag_id)s)''',
+                              {'question_id': question_id, 'tag_id': tag_id})
+
 
 
 @connection.connection_handler
 def delete_tag(cursor, question_id, tag_id):
     cursor.execute('''DELETE FROM question_tag
                       WHERE question_id=%(question_id)s AND tag_id=%(tag_id)s;
-                      DELETE FROM tag
-                      WHERE id=%(tag_id)s;
                       ''',
                    {'question_id': question_id, 'tag_id': tag_id})
 
