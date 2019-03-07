@@ -160,15 +160,16 @@ def delete_answer(answer_id=None):
 
 @app.route('/question/<int:question_id>/delete')
 def delete_question(question_id=None):
-    data_manager.delete_line_by_id('comment', question_id)
+    data_manager.delete_line_by_foreign_id(data_manager.comment_db, 'question_id', question_id)
     filename = 'static/image_for_question' + str(question_id) + '.png'
-    util.delete_file(filename)
+    if util.check_file(filename):
+        util.delete_file(filename)
     answer_ids_to_delete = data_manager.get_ids_by_foreign_id(data_manager.answer_db, 'question_id', question_id)
-    print(answer_ids_to_delete)
     for answer_id in answer_ids_to_delete:
         data_manager.delete_line_by_foreign_id(data_manager.comment_db, 'answer_id', answer_id['id'])
         filename = 'static/image_for_answer' + str(answer_id['id']) + '.png'
-        util.delete_file(filename)
+        if util.check_file(filename):
+            util.delete_file(filename)
     data_manager.delete_answer_by_question_id(question_id)
     data_manager.delete_question(question_id)
     return redirect('/list')
