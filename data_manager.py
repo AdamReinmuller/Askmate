@@ -1,9 +1,6 @@
-import collections
 from psycopg2 import sql
 import connection
 import util
-import urllib.request
-import os
 
 question_db = 'question'
 answer_db = 'answer'
@@ -58,18 +55,6 @@ def sort_table(table, key="", sort=""):
         except:
             questions = sorted(questions, key=lambda x: x[key], reverse=False)
     return questions
-
-
-def save_image_to_file(url, filename):
-    urllib.request.urlretrieve(url, filename)
-
-
-def delete_file(filename):
-    os.remove(filename)
-
-
-def check_file(filename):
-    return os.path.exists(filename)
 
 
 @connection.connection_handler
@@ -250,3 +235,84 @@ def search_answers(cursor, search_phrase):
                     ''', dict(search_phrase='%' + search_phrase + '%'))
     answers = cursor.fetchall()
     return answers
+
+
+
+#zsuzsi
+
+
+@connection.connection_handler
+def get_line_title_by_id(cursor, table, id):
+    cursor.execute(sql.SQL("""
+                    SELECT title FROM {table}
+                    WHERE id = %(id)s
+                   """).format(table=sql.Identifier(table)), {'id': id})
+    title = cursor.fetchall()
+    return title
+
+@connection.connection_handler
+def get_foreign_key_by_id(cursor, table, foreign_key_name, id):
+    cursor.execute(sql.SQL("""
+                    SELECT {foreign_key_name} FROM {table}
+                    WHERE id = %(id)s
+                   """).format(table=sql.Identifier(table), foreign_key_name=sql.Identifier(foreign_key_name)), {'id': id})
+    title = cursor.fetchall()
+    return title
+
+
+@connection.connection_handler
+def get_line_data_by_id(cursor, table, id):
+    cursor.execute(sql.SQL("""
+                    SELECT * FROM {table}
+                    WHERE id = %(id)s
+                    ORDER BY submission_time DESC;
+                   """).format(table=sql.Identifier(table)), {'id': id})
+    line_data = cursor.fetchall()
+    return line_data
+
+
+@connection.connection_handler
+def get_comments_data_by_foreign_id(cursor, foreign_id_name, id):
+    cursor.execute(sql.SQL("""
+                    SELECT id, message, submission_time, edited_count FROM comment
+                    WHERE {foreign_id_name} = %(id)s
+                    ORDER BY submission_time DESC;
+                   """).format(foreign_id_name=sql.Identifier(foreign_id_name)), {'id': id})
+    comments_data = cursor.fetchall()
+    return comments_data
+
+@connection.connection_handler
+def get_lines_data_by_foreign_id(cursor, table, foreign_id_name, id):
+    cursor.execute(sql.SQL("""
+                    SELECT * FROM {table}
+                    WHERE {foreign_id_name} = %(id)s
+                    ORDER BY submission_time DESC;
+                   """).format(table=sql.Identifier(table), foreign_id_name=sql.Identifier(foreign_id_name)), {'id': id})
+    lines_data = cursor.fetchall()
+    return lines_data
+
+@connection.connection_handler
+def add_comment_to_table(cursor, table, id_type, id, message, submission_time, edited_count):
+    cursor.execute(sql.SQL("""
+                    INSERT INTO {table} ({id_type}, message, submission_time, edited_count)
+                    VALUES (%(id)s, %(message)s, %(submission_time)s, %(edited_count)s)
+                   """).format(table=sql.Identifier(table), id_type=sql.Identifier(id_type)),
+                   {'id': id, 'message': message, 'submission_time': submission_time, 'edited_count': edited_count})
+
+@connection.connection_handler
+def delete_line_by_id(cursor, table, id):
+ cursor.execute(sql.SQL("""
+                            DELETE FROM {table}
+                            WHERE id = %(id)s;
+                           """).format(table=sql.Identifier(table)),
+                           {'id': id})
+
+
+@connection.connection_handler
+def update_comment_message_submt_editedc_by_id(cursor, id, message, submission_time):
+ cursor.execute(sql.SQL("""
+                            UPDATE comment
+                            SET edited_count = edited_count+1, message=%(message)s , submission_time=%(submission_time)s
+                            WHERE id = %(id)s;
+                           """).format(message=sql.Identifier(message), submission_time=sql.Identifier(str(submission_time))),
+                           {'message': message, 'submission_time': submission_time, 'id': id})
