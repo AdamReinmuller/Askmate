@@ -149,15 +149,22 @@ def get_key_by_id(table, key, id):
 
 
 @connection.connection_handler
-def delete_answer(cursor, id_):
+def delete_answer_by_id(cursor, id):
     cursor.execute('''
-        SELECT id FROM question
-        WHERE id = %(id_)s''', {'id_': id_})
-    question_id = cursor.fetchall()
+        SELECT question_id FROM answer
+        WHERE id = %(id)s''', {'id': id})
+    question_id = cursor.fetchone()
     cursor.execute('''
     DELETE FROM answer
-    WHERE id = %(id_)s''', {'id_': id_})
+    WHERE id = %(id)s''', {'id': id})
     return question_id
+
+
+@connection.connection_handler
+def delete_answer_by_question_id(cursor, question_id):
+    cursor.execute('''
+    DELETE FROM answer
+    WHERE question_id = %(question_id)s''', {'question_id': question_id})
 
 
 @connection.connection_handler
@@ -306,6 +313,17 @@ def get_lines_data_by_foreign_id(cursor, table, foreign_id_name, id):
     return lines_data
 
 @connection.connection_handler
+def get_lines_data_by_not_foreign_id(cursor, table, foreign_id_name, id):
+    cursor.execute(sql.SQL("""
+                    SELECT * FROM {table}
+                    WHERE {foreign_id_name} <> %(id)s
+                    ORDER BY submission_time DESC;
+                   """).format(table=sql.Identifier(table), foreign_id_name=sql.Identifier(foreign_id_name)), {'id': id})
+    lines_data = cursor.fetchall()
+    return lines_data
+
+
+@connection.connection_handler
 def add_comment_to_table(cursor, table, id_type, id, message, submission_time, edited_count):
     cursor.execute(sql.SQL("""
                     INSERT INTO {table} ({id_type}, message, submission_time, edited_count)
@@ -321,6 +339,13 @@ def delete_line_by_id(cursor, table, id):
                            """).format(table=sql.Identifier(table)),
                            {'id': id})
 
+@connection.connection_handler
+def delete_line_by_foreign_id(cursor, table, foreign_id_name, foreign_id):
+ cursor.execute(sql.SQL("""
+                            DELETE FROM {table}
+                            WHERE {foreign_id_name} = %(foreign_id)s;
+                           """).format(table=sql.Identifier(table), foreign_id_name=sql.Identifier(foreign_id_name)),
+                           {'foreign_id': foreign_id})
 
 @connection.connection_handler
 def update_comment_message_submt_editedc_by_id(cursor, id, message, submission_time):
@@ -340,3 +365,23 @@ def get_headers(cursor, table):
     one_line_from_table_to_get_keys = cursor.fetchone()
     headers = util.get_headers(one_line_from_table_to_get_keys)
     return headers
+
+@connection.connection_handler
+def get_ids_by_foreign_id(cursor, table, foreign_id_name, foreign_id):
+    cursor.execute(sql.SQL("""
+                        SELECT id FROM {table}
+                        WHERE {foreign_id_name} = %(foreign_id)s
+                       """).format(table=sql.Identifier(table), foreign_id_name=sql.Identifier(foreign_id_name)),
+                        {'foreign_id': foreign_id})
+    ids = cursor.fetchall()
+    return ids
+
+@connection.connection_handler
+def get_ids_by_not_foreing_id(cursor, table, foreign_id_name, foreign_id):
+    cursor.execute(sql.SQL("""
+                        SELECT id FROM {table}
+                        WHERE {foreign_id_name} <> %(foreign_id)s
+                       """).format(table=sql.Identifier(table), foreign_id_name=sql.Identifier(foreign_id_name)),
+                        {'foreigh_id': foreign_id})
+    ids = cursor.fetchall()
+    return ids

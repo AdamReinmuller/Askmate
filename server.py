@@ -8,7 +8,7 @@ app = Flask(__name__)
 @app.route('/')
 def index():
     questions = data_manager.sort_table(data_manager.question_db, 'id', 'desc')
-    header = data_manager.get_column_names_of_table(data_manager.question_db)
+    header = data_manager.get_column_names_of_table(data_manager.question_db)[4]
     return render_template('index.html', questions=questions, header=header)
 
 
@@ -95,8 +95,8 @@ def route_question(question_id):
 @app.route('/question/<int:question_id>/new-answer', methods=['GET', 'POST'])
 def post_answer(question_id):
     if request.method == 'GET':
-        single_question = data_manager.get_ordered_dict_by_id(data_manager.answer_db, int(question_id))
-        question_title = single_question['title']
+        single_question = data_manager.get_line_data_by_id(data_manager.question_db, question_id)
+        question_title = single_question[0]['title']
         return render_template('post-answer.html', question_title=question_title)
     elif request.method == 'POST':
         form_answer = request.form['answer_message']
@@ -115,7 +115,7 @@ def add_edit_question(question_id=None):
         title = request.form['question_title']
         message = request.form['question_message']
         data_manager.update_question(question_id, title, message)
-        return redirect('/')
+        return redirect('/question/{}'.format(question_id))
 
     elif request.method == 'GET':
         return render_template('add_questions.html', question_id=question_id)
@@ -128,14 +128,26 @@ def add_edit_question(question_id=None):
 
 @app.route('/answer/<answer_id>/delete')
 def delete_answer(answer_id=None):
-    question_id = data_manager.delete_answer(answer_id)
+    data_manager.delete_line_by_foreign_id(data_manager.comment_db, 'answer_id', answer_id)
+    question_id = data_manager.delete_answer_by_id(answer_id)['question_id']
     return redirect('/question/{}'.format(question_id))
 
 
 @app.route('/question/<int:question_id>/delete')
 def delete_question(question_id=None):
+    data_manager.delete_line_by_id('comment', question_id)
+    filename = 'static/image_for_question' + str(question_id) + '.png'
+    util.delete_file(filename)
+    answer_ids_to_delete = data_manager.get_ids_by_foreign_id(data_manager.answer_db, 'question_id', question_id)
+    print(answer_ids_to_delete)
+    for answer_id in answer_ids_to_delete:
+        data_manager.delete_line_by_foreign_id(data_manager.comment_db, 'answer_id', answer_id['id'])
+        filename = 'static/image_for_answer' + str(answer_id['id']) + '.png'
+        util.delete_file(filename)
+    data_manager.delete_answer_by_question_id(question_id)
     data_manager.delete_question(question_id)
     return redirect('/list')
+
 
 
 @app.route('/question/<int:question_id>/<int:id>/<file_>/<method>')
