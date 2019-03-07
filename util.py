@@ -10,5 +10,5 @@ def get_last_question_id(cursor):
 
 
 def get_time():
-    dt = datetime.now()
+    dt = datetime.now().replace(second=0, microsecond=0)
     return dt
