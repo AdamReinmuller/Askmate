@@ -20,7 +20,7 @@ def get_column_names_of_table(cursor, table):
                                 FROM information_schema.columns
                                 WHERE table_name   = %(table)s
                             """,
-                              {'table': table})
+                   {'table': table})
     keys_ = cursor.fetchall()
     headers = []
     for dict in keys_:
@@ -81,7 +81,7 @@ def add_question(cursor, title, message):
     current_time = util.get_time()
     cursor.execute("""INSERT INTO question
                       (submission_time, view_number, vote_number, title, message, image)
-                      VALUES ( %(submission_time)s, 0, 0, %(title)s, %(message)s, 'no image' )
+                      VALUES ( %(submission_time)s, 0, 0, %(title)s, %(message)s, 'no image' );
                     """,
                    dict(submission_time=current_time, title=title, message=message)
                    )
@@ -149,6 +149,7 @@ def get_key_by_id(table, key, id):
         if int(row['id']) == int(id):
             return row[key]
 
+
 @connection.connection_handler
 def delete_answer(cursor, id_):
     cursor.execute('''
@@ -157,20 +158,25 @@ def delete_answer(cursor, id_):
     question_id = cursor.fetchall()
     cursor.execute('''
     DELETE FROM answer
-    WHERE id = %(id_)s''', {'id_':id_})
+    WHERE id = %(id_)s''', {'id_': id_})
     return question_id
+
 
 @connection.connection_handler
 def delete_question(cursor, id_):
     cursor.execute('''
+    DELETE FROM question_tag
+    WHERE question_id=%(id_)s;
     DELETE FROM question
-    WHERE id = %(id_)s''', {'id_':id_})
+    WHERE id = %(id_)s;
+    ''', {'id_': id_})
+
 
 @connection.connection_handler
 def get_question_by_id(cursor, id_):
     cursor.execute('''
     SELECT * FROM question
-    WHERE id = %(id_)s''', {'id_':id_})
+    WHERE id = %(id_)s''', {'id_': id_})
     question = cursor.fetchall()
     return question
 
@@ -219,6 +225,32 @@ def change_vote_number_in_table(cursor, table, id_, method):
                        )
 
 
+@connection.connection_handler
+def add_tag_to_question(cursor, question_id, tag):
+    cursor.execute('''INSERT INTO tag (name) VALUES (%(tag)s)''', {'tag': tag})
+    cursor.execute('''SELECT id FROM tag
+    WHERE name = (%(tag)s)''', {'tag': tag})
+    tag_id = cursor.fetchone()['id']
+    cursor.execute('''DELETE FROM question_tag
+                      WHERE question_id=%(question_id)s;
+                      INSERT INTO question_tag
+                      VALUES (%(question_id)s, %(tag_id)s)
+                      '''
+                   , {'question_id': question_id, 'tag_id': tag_id})
+
+
+@connection.connection_handler
+def delete_tag(cursor, question_id):
+    cursor.execute('''SELECT tag_id FROM question_tag
+                      WHERE question_id=%(question_id)s''', {'question_id': question_id})
+    tag_id = cursor.fetchone()['tag_id']
+    cursor.execute('''DELETE FROM question_tag
+                      WHERE question_id=%(question_id)s AND tag_id=%(tag_id)s;
+                      DELETE FROM tag
+                      WHERE id=%(tag_id)s''',
+                   {'question_id': question_id, 'tag_id': tag_id})
+
+
 """ nested_ordered_dicts = import_from_db(table)
 for row in nested_ordered_dicts:
     if int(row['id']) == int(id_):
@@ -228,3 +260,6 @@ for row in nested_ordered_dicts:
             row['vote_number'] = int(row['vote_number']) - 1
 
 connection.export_csv(filename, nested_ordered_dicts)"""
+
+# @connection.connection_handler
+# def delete_tag():
