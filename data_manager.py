@@ -215,7 +215,7 @@ def change_vote_number_in_table(cursor, table, id_, method):
     """
     if method == 'up':
         cursor.execute(sql.SQL("""
-                            UPDATE{table}
+                            UPDATE {table}
                             SET vote_number = vote_number+1
                             WHERE id = %(id)s;
                            """).format(table=sql.Identifier(table)),
@@ -223,7 +223,7 @@ def change_vote_number_in_table(cursor, table, id_, method):
                        )
     elif method == 'down':
         cursor.execute(sql.SQL("""
-                                UPDATE{table}
+                                UPDATE {table}
                                 SET vote_number = vote_number-1
                                 WHERE id = %(id)s;
                                """).format(table=sql.Identifier(table)),
