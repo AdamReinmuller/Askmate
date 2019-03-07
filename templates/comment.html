@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ 'Edit comment' if comment_id >=0 else 'Add comment' }}</title>
+</head>
+<body>
+<h1>{{ 'Edit comment' if comment_id >=0 else 'Add comment' }}</h1>
+<h4><a href="/">Back to Main page</a></h4>
+{% if comment_id >=0 %}
+    <form method="POST">
+        <label for="comment">Please edit your comment:</label><br>
+        <textarea name="comment" rows="10" cols="70" minlength="10" required>{{ comment[0]['message'] }}</textarea><br>
+        <button type="submit">Save edited comment</button>
+    </form>
+
+{% else %}
+    <form method="POST">
+        <p>{{ 'Answer:' if answer_id else 'Question:' }} {{ answer_message if answer_id else question_title }}</p>
+        <label for="comment">Please type in your comment:</label><br>
+        <textarea name="comment" rows="10" cols="70" minlength="10" required></textarea><br>
+        <button type="submit">Add comment</button>
+    </form>
+
+{% endif %}
+</body>
+</html>
+
+
+
