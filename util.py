@@ -29,11 +29,6 @@ def get_tags(cursor, id_=None):
         return False
 
 
-def get_headers(table_):
-    headers = table_.keys()
-    return headers
-
-
 def save_image_to_file(url, filename):
     urllib.request.urlretrieve(url, filename)
 
