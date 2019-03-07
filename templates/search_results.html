@@ -8,6 +8,7 @@
         <h1>Search Results</h1>
         <h4><a href="/">Homepage</a></h4>
     <br>
+    {% if questions|length > 0 %}
     <table style="width:90%" border="1">
         <tr>
             {% for header in headers %}
@@ -49,5 +50,8 @@
 
     {% endfor %}
     </table>
+    {% else %}
+        <h4>No Result</h4>
+    {% endif %}
     </body>
 </html>

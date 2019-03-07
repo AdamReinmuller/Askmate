@@ -229,7 +229,7 @@ def search(cursor, search_phrase):
     cursor.execute('''
                     SELECT question.*
                     FROM question
-                    inner join answer
+                    FULL JOIN answer
                     ON question.id = answer.question_id
                     WHERE question.message LIKE %(search_phrase)s OR
                           question.title LIKE %(search_phrase)s OR
