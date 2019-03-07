@@ -23,14 +23,73 @@ def route_list():
     return render_template('list.html', questions=questions, headers=headers)
 
 
+@app.route('/question/<int:question_id>/new-comment', methods=['GET', 'POST'])
+def add_comment_to_question(question_id, comment=None, comment_id=-1):
+    if request.method == 'GET':
+        question_title = data_manager.get_line_data_by_id('question', question_id)[0]['title']
+        return render_template('comment.html', question_title=question_title, comment=comment, comment_id=comment_id)
+
+    elif request.method == 'POST':
+        data_manager.add_comment_to_table('comment', 'question_id', question_id, request.form['comment'], util.submission_time(), 0)
+        return redirect('/question/{}'.format(question_id))
+
+
+@app.route('/answer/<int:answer_id>/new-comment', methods=['GET', 'POST'])
+def add_comment_to_answer(answer_id, comment=None, comment_id=-1):
+    if request.method == 'GET':
+        answer_message = data_manager.get_line_data_by_id('answer', answer_id)[0]['message']
+        return render_template('comment.html', answer_id=answer_id, answer_message=answer_message, comment=comment, comment_id=comment_id)
+
+    elif request.method == 'POST':
+        question_id = data_manager.get_foreign_key_by_id('answer', 'question_id', answer_id)[0]['question_id']
+        data_manager.add_comment_to_table('comment', 'answer_id', answer_id, request.form['comment'], util.submission_time(), 0)
+        return redirect('/question/{}'.format(question_id))
+
+@app.route('/comments/<int:comment_id>/delete')
+def delete_comment(comment_id):
+    answer_id = data_manager.get_foreign_key_by_id('comment', 'answer_id', comment_id)[0]['answer_id']
+    if answer_id:
+        question_id = data_manager.get_foreign_key_by_id('answer', 'question_id', answer_id)[0]['question_id']
+    else:
+        question_id = data_manager.get_foreign_key_by_id('comment', 'question_id', comment_id)[0]['question_id']
+    data_manager.delete_line_by_id('comment', comment_id)
+    return redirect('/question/{}'.format(question_id))
+
+
+@app.route('/comments/<int:comment_id>/edit', methods=['GET', 'POST'])
+def edit_comment(comment_id):
+    if request.method == 'GET':
+        comment = data_manager.get_line_data_by_id('comment', comment_id)
+        return render_template('comment.html', comment_id= comment_id, comment=comment)
+
+    elif request.method == 'POST':
+        answer_id = data_manager.get_foreign_key_by_id('comment', 'answer_id', comment_id)[0]['answer_id']
+        if answer_id:
+            question_id = data_manager.get_foreign_key_by_id('answer', 'question_id', answer_id)[0]['question_id']
+        else:
+            question_id = data_manager.get_foreign_key_by_id('comment', 'question_id', comment_id)[0]['question_id']
+        data_manager.update_comment_message_submt_editedc_by_id(comment_id, request.form['comment'], util.submission_time())
+        return redirect('/question/{}'.format(question_id))
+
+
 @app.route('/question/<int:question_id>')
 def route_question(question_id):
-    question = data_manager.get_ordered_dict_by_id('data/question.csv', question_id)
-    headers_q = util.get_headers('data/question.csv')
-    answers = data_manager.get_list_by_key('data/answer.csv', question_id, 'question_id')
-    headers_a = util.get_headers('data/answer.csv')
-    return render_template('question.html', question=question, headers_q=headers_q, answers=answers,
-                           headers_a=headers_a)
+    question = data_manager.get_line_data_by_id('question', question_id)
+    headers_q = data_manager.get_headers('question')
+    headers_c = list(data_manager.get_headers('comment'))[3:5]
+    headers_a = data_manager.get_headers('answer')
+    comments_q = data_manager.get_comments_data_by_foreign_id('question_id', question_id)
+    answers = data_manager.get_lines_data_by_foreign_id('answer', 'question_id', question_id)
+    filename_q = '/static/image_for_question' + str(question_id) + '.png'
+    image_q = util.check_file(filename_q.lstrip("/"))
+    answer_ids = {}
+    for answer in answers:
+        answer_ids[answer['id']] = [util.check_file('static/image_for_answer' + str(answer['id']) + '.png'),
+                                              '/static/image_for_answer' + str(answer['id']) + '.png',
+                                                data_manager.get_lines_data_by_foreign_id('comment', 'answer_id', answer['id'])]
+    return render_template('question.html', question_id=question_id, question=question, headers_q=headers_q,
+                           comments_q=comments_q, headers_c=headers_c, answers=answers,
+                           headers_a=headers_a, image_q=image_q, filename_q=filename_q, answer_ids=answer_ids)
 
 
 @app.route('/question/<int:question_id>/new-answer', methods=['GET', 'POST'])
