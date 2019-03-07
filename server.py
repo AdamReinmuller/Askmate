@@ -92,6 +92,44 @@ def route_question(question_id):
                            headers_a=headers_a, image_q=image_q, filename_q=filename_q, answer_ids=answer_ids)
 
 
+@app.route('/question/<int:question_id>/add-image', methods=['GET', 'POST'])
+def add_image(question_id):
+    if request.method == 'GET':
+        return render_template('add-image.html', question_id=question_id)
+    elif request.method == 'POST':
+        url = request.form['URL']
+        filename = 'static/image_for_question' + str(question_id) + '.png'
+        util.save_image_to_file(url, filename)
+        data_manager.update_image_data_by_id(data_manager.question_db, question_id, filename)
+        return redirect('/question/{}'.format(question_id))
+
+
+@app.route('/question/<int:question_id>/<int:answer_id>/add-image', methods=['GET', 'POST'])
+def add_image_a(question_id, answer_id):
+    if request.method == 'GET':
+        return render_template('add-image.html')
+    elif request.method == 'POST':
+        url = request.form['URL']
+        filename = 'static/image_for_answer' + str(answer_id) + '.png'
+        util.save_image_to_file(url, filename)
+        data_manager.update_image_data_by_id(data_manager.answer_db, answer_id, filename)
+        return redirect('/question/{}'.format(question_id))
+
+
+@app.route('/question/<int:question_id>/delete-image')
+def delete_question_image(question_id):
+    filename = 'static/image_for_question' + str(question_id) + '.png'
+    util.delete_file(filename)
+    return redirect('/question/{}'.format(question_id))
+
+
+@app.route('/question/<int:question_id>/<int:answer_id>/delete-image')
+def delete_answer_image(question_id, answer_id):
+    filename = 'static/image_for_answer' + str(answer_id) + '.png'
+    util.delete_file(filename)
+    return redirect('/question/{}'.format(question_id))
+
+
 @app.route('/question/<int:question_id>/new-answer', methods=['GET', 'POST'])
 def post_answer(question_id):
     if request.method == 'GET':
@@ -155,6 +193,9 @@ def delete_tag(question_id=None):
 def delete_answer(answer_id=None):
     data_manager.delete_line_by_foreign_id(data_manager.comment_db, 'answer_id', answer_id)
     question_id = data_manager.delete_answer_by_id(answer_id)['question_id']
+    filename = 'static/image_for_answer' + str(answer_id) + '.png'
+    if util.check_file(filename):
+        util.delete_file(filename)
     return redirect('/question/{}'.format(question_id))
 
 

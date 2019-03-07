@@ -13,7 +13,7 @@
         {% for comment in comments_q %}
             <tr>
                 <td>{{ comment['message'] }}<br>
-                    {% if comment['edited_count'] >= 0 %}
+                    {% if comment['edited_count'] > 0 %}
                     <p>Edited {{ comment['edited_count'] }} times.<p>
                     {% endif %}
                 </td>

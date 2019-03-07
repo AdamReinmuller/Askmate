@@ -401,3 +401,13 @@ def get_ids_by_not_foreing_id(cursor, table, foreign_id_name, foreign_id):
                         {'foreigh_id': foreign_id})
     ids = cursor.fetchall()
     return ids
+
+
+@connection.connection_handler
+def update_image_data_by_id(cursor, table, id, filename):
+    cursor.execute(sql.SQL("""UPDATE {table}
+                      SET image = %(filename)s
+                      WHERE id = %(id)s
+                        """).format(table=sql.Identifier(table)),
+                   dict(id=id, filename=filename)
+                   )
