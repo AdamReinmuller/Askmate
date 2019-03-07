@@ -222,8 +222,7 @@ def add_tag_to_question(cursor, question_id, tag):
     cursor.execute('''SELECT id FROM tag
     WHERE name = (%(tag)s)''', {'tag': tag})
     tag_id = cursor.fetchone()['id']
-    cursor.execute('''DELETE FROM question_tag
-                      WHERE question_id=%(question_id)s;
+    cursor.execute('''
                       INSERT INTO question_tag
                       VALUES (%(question_id)s, %(tag_id)s)
                       '''
@@ -231,10 +230,7 @@ def add_tag_to_question(cursor, question_id, tag):
 
 
 @connection.connection_handler
-def delete_tag(cursor, question_id):
-    cursor.execute('''SELECT tag_id FROM question_tag
-                      WHERE question_id=%(question_id)s''', {'question_id': question_id})
-    tag_id = cursor.fetchone()['tag_id']
+def delete_tag(cursor, question_id, tag_id):
     cursor.execute('''DELETE FROM question_tag
                       WHERE question_id=%(question_id)s AND tag_id=%(tag_id)s;
                       DELETE FROM tag

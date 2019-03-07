@@ -1,3 +1,4 @@
+import urllib
 from datetime import datetime
 import urllib.request
 import connection
@@ -14,19 +15,17 @@ def get_time():
     dt = datetime.now().replace(second=0, microsecond=0)
     return dt
 
-
 @connection.connection_handler
-def get_tag(cursor, id_=1):
+def get_tags(cursor, id_=None):
     try:
         cursor.execute('''  SELECT tag_id FROM question_tag
                             WHERE question_id = %(id_)s''', {'id_': id_})
-        tag_id = cursor.fetchone()['tag_id']
-        cursor.execute('''  SELECT name FROM tag
-                            WHERE id = %(tag_id)s''', {'tag_id': tag_id})
+        tags_id = tuple(id['tag_id'] for id in cursor.fetchall())
+        cursor.execute('''  SELECT name, id FROM tag
+                            WHERE id IN %(tags_id)s''', {'tags_id': tags_id})
         tags_dict = cursor.fetchall()
-        tag = tags_dict[0]['name']
-        return tag
-    except TypeError:
+        return tags_dict
+    except:
         return False
 
 
