@@ -9,6 +9,11 @@
 <h4><a href="/list">List of all questions</a></h4>
 <h4><a href="/add-question">Add new question</a></h4>
 <br>
+<form action="/search" method="post">
+<input type="text" name="search_phrase">
+<input type="submit" value="Search">
+</form>
+<br>
 <table style="width:90%" border="1">
     <tr>
         <th>{{ header }}</th>
