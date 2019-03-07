@@ -131,16 +131,28 @@ def delete_answer_image(question_id, answer_id):
     return redirect('/question/{}'.format(question_id))
 
 
+@app.route('/question/<int:question_id>/<int:answer_id>', methods=['GET', 'POST'])
 @app.route('/question/<int:question_id>/new-answer', methods=['GET', 'POST'])
-def post_answer(question_id):
-    if request.method == 'GET':
+def post_answer(question_id, answer_id=""):
+    if request.path == '/question/' + str(question_id) + '/' + str(answer_id) and request.method=='GET':
         single_question = data_manager.get_line_data_by_id(data_manager.question_db, question_id)
         question_title = single_question[0]['title']
-        return render_template('post-answer.html', question_title=question_title)
-    elif request.method == 'POST':
+        answer = data_manager.get_line_data_by_id(data_manager.answer_db, answer_id)[0]
+        return render_template('post-answer.html', question_title=question_title, answer=answer, answer_id=answer_id)
+
+    elif request.path == '/question/' + str(question_id) + '/' + str(answer_id) and request.method == 'POST':
         form_answer = request.form['answer_message']
-        data_manager.add_answer(question_id, form_answer)
+        data_manager.update_answer(answer_id, form_answer)
         return redirect('/question/{}'.format(question_id))
+    else:
+        if request.method == 'POST':
+            form_answer = request.form['answer_message']
+            data_manager.add_answer(question_id, form_answer)
+            return redirect('/question/{}'.format(question_id))
+        else:
+            single_question = data_manager.get_line_data_by_id(data_manager.question_db, question_id)
+            question_title = single_question[0]['title']
+            return render_template('post-answer.html', question_title=question_title, answer_id=answer_id)
 
 
 @app.route('/add-question', methods=['GET', 'POST'])

@@ -186,7 +186,7 @@ def update_question(cursor, id_, title, message):
 @connection.connection_handler
 def update_answer(cursor, id_, message):
     cursor.execute("""UPDATE answer
-                      SET message = %(message)s,
+                      SET message = %(message)s
                       WHERE id = %(id_)s
                         """,
                    dict(id_=id_, message=message)
