@@ -126,6 +126,31 @@ def add_edit_question(question_id=None):
         return redirect('/question/{}'.format(question_id))
 
 
+@app.route('/question/<int:question_id>/add-tag', methods=['GET', 'POST'])
+def add_tag_to_question(question_id=None):
+    if request.method == 'GET':
+        question = data_manager.get_question_by_id(question_id)
+        question_title = question[0]['title']
+        tag = util.get_tag(question_id)
+        return render_template('add_tag.html', question_title=question_title, tag=tag, question_id=question_id)
+    else:
+        question = data_manager.get_question_by_id(question_id)
+        question_id_to_add = question[0]['id']
+        tag = request.form['new_tag']
+        data_manager.add_tag_to_question(question_id_to_add, tag)
+        return redirect('/question/{}'.format(question_id))
+
+
+@app.route('/question/<int:question_id>/delete-tag')
+def delete_tag(question_id=None):
+    try:
+        data_manager.delete_tag(question_id)
+    except:
+        pass
+    finally:
+        return redirect('/question/{}'.format(question_id))
+
+
 @app.route('/answer/<answer_id>/delete')
 def delete_answer(answer_id=None):
     data_manager.delete_line_by_foreign_id(data_manager.comment_db, 'answer_id', answer_id)

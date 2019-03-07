@@ -5,7 +5,6 @@ import util
 import urllib.request
 import os
 
-
 question_db = 'question'
 answer_db = 'answer'
 comment_db = 'comment'
@@ -254,7 +253,8 @@ def delete_tag(cursor, question_id):
     cursor.execute('''DELETE FROM question_tag
                       WHERE question_id=%(question_id)s AND tag_id=%(tag_id)s;
                       DELETE FROM tag
-                      WHERE id=%(tag_id)s''',
+                      WHERE id=%(tag_id)s;
+                      ''',
                    {'question_id': question_id, 'tag_id': tag_id})
 
 
