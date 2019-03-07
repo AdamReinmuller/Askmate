@@ -82,6 +82,7 @@ def route_question(question_id):
     answers = data_manager.get_lines_data_by_foreign_id('answer', 'question_id', question_id)
     filename_q = '/static/image_for_question' + str(question_id) + '.png'
     image_q = util.check_file(filename_q.lstrip("/"))
+    tags = util.get_tags(question_id)
     answer_ids = {}
     for answer in answers:
         answer_ids[answer['id']] = [util.check_file('static/image_for_answer' + str(answer['id']) + '.png'),
@@ -89,7 +90,7 @@ def route_question(question_id):
                                                 data_manager.get_lines_data_by_foreign_id('comment', 'answer_id', answer['id'])]
     return render_template('question.html', question_id=question_id, question=question, headers_q=headers_q,
                            comments_q=comments_q, headers_c=headers_c, answers=answers,
-                           headers_a=headers_a, image_q=image_q, filename_q=filename_q, answer_ids=answer_ids)
+                           headers_a=headers_a, image_q=image_q, filename_q=filename_q, answer_ids=answer_ids, tags=tags)
 
 
 @app.route('/question/<int:question_id>/add-image', methods=['GET', 'POST'])

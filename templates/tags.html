@@ -1,0 +1,12 @@
+<tags>
+    {% if tags %}
+        <ul>
+        {% for tag in tags %}
+            <li>
+            #{{ tag['name'] }}<a href="/question/{{ question_id }}/{{ tag['id'] }}/delete-tag">x</a>
+            </li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    <p></p>
+</tags>

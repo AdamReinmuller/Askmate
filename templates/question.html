@@ -3,11 +3,14 @@
 <head>
     <meta charset="utf-8">
     <title>Details of Question</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
 <h1>Details of Question</h1>
 <h4><a href="/">Back to Main page</a></h4>
+<br>
+{% include 'tags.html' %}
 <br>
 <table style="width:90%" border="1">
     <tr>
