@@ -28,6 +28,12 @@ def get_tags(cursor, id_=None):
     except:
         return False
 
+@connection.connection_handler
+def get_questions_by_tag(cursor, tag_id):
+    cursor.execute('''SELECT question_id FROM question_tag
+                      WHERE tag_id=%(tag_id)s''', {'tag_id':tag_id})
+    question_ids = [id['question_id'] for id in cursor.fetchall()]
+    return question_ids
 
 def get_headers(table_):
     headers = table_.keys()
