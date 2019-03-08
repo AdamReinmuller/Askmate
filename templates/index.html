@@ -10,8 +10,8 @@
 <h4><a href="/add-question">Add new question</a></h4>
 <br>
 <form action="/search" method="post">
-<input type="text" name="search_phrase">
-<input type="submit" value="Search">
+    <input type="text" name="search_phrase">
+    <input type="submit" value="Search">
 </form>
 <br>
 <table style="width:90%" border="1">
@@ -21,11 +21,10 @@
         <th>Delete question</th>
         <th>Edit question</th>
     </tr>
-
     {% for question in questions %}
         <tr>
             <td>
-                <a href="/question/{{ question['id'] }}">{{ question['title'] }}</a>
+                <a href="/question/{{ question['id'] }}/view_counter">{{ question['title'] }}</a>
             </td>
             <td>
                 <a href="/question/{{ question['id'] }}/new-answer">Add an answer</a>
@@ -39,7 +38,6 @@
             </td>
         </tr>
     {% endfor %}
-
 </table>
 </body>
 </html>

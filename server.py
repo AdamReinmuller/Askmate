@@ -34,15 +34,16 @@ def add_comment(question_id=None, answer_id=None, comment=None, comment_id=-1):
         else:
             answer_message = data_manager.get_line_data_by_id(data_manager.answer_db, answer_id)[0]['message']
             return render_template('comment.html', answer_id=answer_id, answer_message=answer_message,
-                               comment=comment,
-                               comment_id=comment_id)
+                                   comment=comment,
+                                   comment_id=comment_id)
 
     elif request.method == 'POST':
         if request.path.startswith("/q"):
             data_manager.add_comment_to_table(data_manager.comment_db, 'question_id', question_id,
-                                      request.form['comment'], util.get_time(), 0)
+                                              request.form['comment'], util.get_time(), 0)
         else:
-            question_id = data_manager.get_foreign_key_by_id(data_manager.answer_db, 'question_id', answer_id)[0]['question_id']
+            question_id = data_manager.get_foreign_key_by_id(data_manager.answer_db, 'question_id', answer_id)[0][
+                'question_id']
             data_manager.add_comment_to_table(data_manager.comment_db, 'answer_id', answer_id, request.form['comment'],
                                               util.get_time(), 0)
         return redirect('/question/{}'.format(question_id))
@@ -52,9 +53,11 @@ def add_comment(question_id=None, answer_id=None, comment=None, comment_id=-1):
 def delete_comment(comment_id):
     answer_id = data_manager.get_foreign_key_by_id(data_manager.comment_db, 'answer_id', comment_id)[0]['answer_id']
     if answer_id:
-        question_id = data_manager.get_foreign_key_by_id(data_manager.answer_db, 'question_id', answer_id)[0]['question_id']
+        question_id = data_manager.get_foreign_key_by_id(data_manager.answer_db, 'question_id', answer_id)[0][
+            'question_id']
     else:
-        question_id = data_manager.get_foreign_key_by_id(data_manager.comment_db, 'question_id', comment_id)[0]['question_id']
+        question_id = data_manager.get_foreign_key_by_id(data_manager.comment_db, 'question_id', comment_id)[0][
+            'question_id']
     data_manager.delete_line_by_id(data_manager.comment_db, comment_id)
     return redirect('/question/{}'.format(question_id))
 
@@ -63,22 +66,22 @@ def delete_comment(comment_id):
 def edit_comment(comment_id):
     if request.method == 'GET':
         comment = data_manager.get_line_data_by_id(data_manager.comment_db, comment_id)
-        return render_template('comment.html', comment_id= comment_id, comment=comment)
+        return render_template('comment.html', comment_id=comment_id, comment=comment)
 
     elif request.method == 'POST':
         answer_id = data_manager.get_foreign_key_by_id(data_manager.comment_db, 'answer_id', comment_id)[0]['answer_id']
         if answer_id:
-            question_id = data_manager.get_foreign_key_by_id(data_manager.answer_db, 'question_id', answer_id)[0]['question_id']
+            question_id = data_manager.get_foreign_key_by_id(data_manager.answer_db, 'question_id', answer_id)[0][
+                'question_id']
         else:
-            question_id = data_manager.get_foreign_key_by_id(data_manager.comment_db, 'question_id', comment_id)[0]['question_id']
+            question_id = data_manager.get_foreign_key_by_id(data_manager.comment_db, 'question_id', comment_id)[0][
+                'question_id']
         data_manager.update_comment_message_submt_editedc_by_id(comment_id, request.form['comment'], util.get_time())
         return redirect('/question/{}'.format(question_id))
 
 
 @app.route('/question/<int:question_id>')
 def route_question(question_id):
-    if request == 'Request ''{}/question/{}'' [GET]'.format(request.host_url, question_id):
-        data_manager.update_view_number_in_question_by_id(question_id)
     question = data_manager.get_line_data_by_id(data_manager.question_db, question_id)
     headers_q = data_manager.get_column_names_of_table(data_manager.question_db)
     headers_c = data_manager.get_column_names_of_table(data_manager.comment_db)[3:5]
@@ -91,11 +94,19 @@ def route_question(question_id):
     answer_ids = {}
     for answer in answers:
         answer_ids[answer['id']] = [util.check_file('static/image_for_answer' + str(answer['id']) + '.png'),
-                                              '/static/image_for_answer' + str(answer['id']) + '.png',
-                                                data_manager.get_lines_data_by_foreign_id(data_manager.comment_db, 'answer_id', answer['id'])]
+                                    '/static/image_for_answer' + str(answer['id']) + '.png',
+                                    data_manager.get_lines_data_by_foreign_id(data_manager.comment_db, 'answer_id',
+                                                                              answer['id'])]
     return render_template('question.html', question_id=question_id, question=question, headers_q=headers_q,
                            comments_q=comments_q, headers_c=headers_c, answers=answers,
-                           headers_a=headers_a, image_q=image_q, filename_q=filename_q, answer_ids=answer_ids, tags=tags)
+                           headers_a=headers_a, image_q=image_q, filename_q=filename_q, answer_ids=answer_ids,
+                           tags=tags)
+
+
+@app.route('/question/<int:question_id>/view_counter')
+def route_question_view_counter(question_id):
+    data_manager.update_view_number_in_question_by_id(question_id)
+    return redirect('/question/{}'.format(question_id))
 
 
 @app.route('/question/<int:question_id>/add-image', methods=['GET', 'POST'])
@@ -139,7 +150,7 @@ def delete_answer_image(question_id, answer_id):
 @app.route('/question/<int:question_id>/<int:answer_id>', methods=['GET', 'POST'])
 @app.route('/question/<int:question_id>/new-answer', methods=['GET', 'POST'])
 def post_answer(question_id, answer_id=""):
-    if request.path == '/question/' + str(question_id) + '/' + str(answer_id) and request.method=='GET':
+    if request.path == '/question/' + str(question_id) + '/' + str(answer_id) and request.method == 'GET':
         single_question = data_manager.get_line_data_by_id(data_manager.question_db, question_id)
         question_title = single_question[0]['title']
         answer = data_manager.get_line_data_by_id(data_manager.answer_db, answer_id)[0]
@@ -180,6 +191,7 @@ def add_edit_question(question_id=None):
         data_manager.add_question(request.form['question_title'], request.form['question'])
         question_id = util.get_last_question_id()
         return redirect('/question/{}'.format(question_id))
+
 
 @app.route('/question/<int:question_id>/add-tag', methods=['GET', 'POST'])
 def add_tag_to_question(question_id=None):
@@ -231,7 +243,6 @@ def delete_question(question_id=None):
     data_manager.delete_answer_by_question_id(question_id)
     data_manager.delete_question(question_id)
     return redirect('/list')
-
 
 
 @app.route('/question/<int:question_id>/<int:id>/<file_>/<method>')
