@@ -85,55 +85,6 @@ def add_answer(cursor, question_id, message):
                    )
 
 
-def get_ordered_dict_by_id(table, id):
-    """
-    :param table: database's table
-    :param id: input id as integer
-    :return: one ordered dict
-    """
-    nested_ordered_dicts = import_from_db(table)
-    for row in nested_ordered_dicts:
-        if int(row['id']) == id:
-            return row
-
-
-def get_list_by_key(table, data, key):
-    """
-    :param table: database's table
-    :param data: input data
-    :param key: the key of the dictionary where i searh for the data
-    :return: one ordered dict
-    """
-    result = []
-    nested_ordered_dicts = import_from_db(table)
-    for row in nested_ordered_dicts:
-        if int(row[key]) == data:
-            result.append(row)
-    return result
-
-
-def get_list_by_not_key(table, data, key):
-    """
-    :param table: database's table
-    :param data: input data
-    :param key: the key of the dictionary where i searh for the data
-    :return: one ordered dict
-    """
-    result = []
-    nested_ordered_dicts = import_from_db(table)
-    for row in nested_ordered_dicts:
-        if int(row[key]) != data:
-            result.append(row)
-    return result
-
-
-def get_key_by_id(table, key, id):
-    nested_ordered_dicts = import_from_db(table)
-    for row in nested_ordered_dicts:
-        if int(row['id']) == int(id):
-            return row[key]
-
-
 @connection.connection_handler
 def delete_answer_by_id(cursor, id):
     cursor.execute('''
@@ -290,15 +241,6 @@ def search_answers(cursor, search_phrase):
 
 
 @connection.connection_handler
-def get_line_title_by_id(cursor, table, id):
-    cursor.execute(sql.SQL("""
-                    SELECT title FROM {table}
-                    WHERE id = %(id)s
-                   """).format(table=sql.Identifier(table)), {'id': id})
-    title = cursor.fetchall()
-    return title
-
-@connection.connection_handler
 def get_foreign_key_by_id(cursor, table, foreign_key_name, id):
     cursor.execute(sql.SQL("""
                     SELECT {foreign_key_name} FROM {table}
@@ -334,16 +276,6 @@ def get_lines_data_by_foreign_id(cursor, table, foreign_id_name, id):
     cursor.execute(sql.SQL("""
                     SELECT * FROM {table}
                     WHERE {foreign_id_name} = %(id)s
-                    ORDER BY submission_time DESC;
-                   """).format(table=sql.Identifier(table), foreign_id_name=sql.Identifier(foreign_id_name)), {'id': id})
-    lines_data = cursor.fetchall()
-    return lines_data
-
-@connection.connection_handler
-def get_lines_data_by_not_foreign_id(cursor, table, foreign_id_name, id):
-    cursor.execute(sql.SQL("""
-                    SELECT * FROM {table}
-                    WHERE {foreign_id_name} <> %(id)s
                     ORDER BY submission_time DESC;
                    """).format(table=sql.Identifier(table), foreign_id_name=sql.Identifier(foreign_id_name)), {'id': id})
     lines_data = cursor.fetchall()
@@ -385,31 +317,12 @@ def update_comment_message_submt_editedc_by_id(cursor, id, message, submission_t
 
 
 @connection.connection_handler
-def get_headers(cursor, table):
-    cursor.execute(sql.SQL("""
-                    SELECT * FROM {table};
-                   """).format(table=sql.Identifier(table)))
-    one_line_from_table_to_get_keys = cursor.fetchone()
-    headers = util.get_headers(one_line_from_table_to_get_keys)
-    return headers
-
-@connection.connection_handler
 def get_ids_by_foreign_id(cursor, table, foreign_id_name, foreign_id):
     cursor.execute(sql.SQL("""
                         SELECT id FROM {table}
                         WHERE {foreign_id_name} = %(foreign_id)s
                        """).format(table=sql.Identifier(table), foreign_id_name=sql.Identifier(foreign_id_name)),
                         {'foreign_id': foreign_id})
-    ids = cursor.fetchall()
-    return ids
-
-@connection.connection_handler
-def get_ids_by_not_foreing_id(cursor, table, foreign_id_name, foreign_id):
-    cursor.execute(sql.SQL("""
-                        SELECT id FROM {table}
-                        WHERE {foreign_id_name} <> %(foreign_id)s
-                       """).format(table=sql.Identifier(table), foreign_id_name=sql.Identifier(foreign_id_name)),
-                        {'foreigh_id': foreign_id})
     ids = cursor.fetchall()
     return ids
 
@@ -422,3 +335,14 @@ def update_image_data_by_id(cursor, table, id, filename):
                         """).format(table=sql.Identifier(table)),
                    dict(id=id, filename=filename)
                    )
+
+
+@connection.connection_handler
+def get_five_latest_submitted_titles_with_ids_from_table(cursor, table):
+    cursor.execute(sql.SQL("""
+                    SELECT title, id FROM {table} 
+                    ORDER BY submission_time DESC
+                    LIMIT 5
+                   """).format(table=sql.Identifier(table)))
+    five_latest_titles_with_ids_from_table = cursor.fetchall()
+    return five_latest_titles_with_ids_from_table

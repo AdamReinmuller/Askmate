@@ -35,11 +35,6 @@ def get_questions_by_tag(cursor, tag_id):
     question_ids = [id['question_id'] for id in cursor.fetchall()]
     return question_ids
 
-def get_headers(table_):
-    headers = table_.keys()
-    return headers
-
-
 def save_image_to_file(url, filename):
     urllib.request.urlretrieve(url, filename)
 
