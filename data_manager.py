@@ -338,6 +338,13 @@ def update_image_data_by_id(cursor, table, id, filename):
 
 
 @connection.connection_handler
+def update_view_number_in_question_by_id(cursor, id):
+    cursor.execute("""UPDATE question
+                      SET view_number = view_number+1
+                      WHERE id = %(id)s
+                        """, {'id': id})
+
+@connection.connection_handler
 def get_five_latest_submitted_titles_with_ids_from_table(cursor, table):
     cursor.execute(sql.SQL("""
                     SELECT title, id FROM {table} 
