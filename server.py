@@ -77,7 +77,7 @@ def edit_comment(comment_id):
 
 @app.route('/question/<int:question_id>')
 def route_question(question_id):
-    if request == 'Request ''http://127.0.0.1:5000/question/{}'' [GET]'.format(question_id):
+    if request == 'Request ''{}/question/{}'' [GET]'.format(request.host_url, question_id):
         data_manager.update_view_number_in_question_by_id(question_id)
     question = data_manager.get_line_data_by_id(data_manager.question_db, question_id)
     headers_q = data_manager.get_column_names_of_table(data_manager.question_db)
