@@ -388,3 +388,14 @@ def get_questions_by_tag(cursor, tag_id):
                       WHERE tag_id=%(tag_id)s''', {'tag_id': tag_id})
     question_ids = [id['question_id'] for id in cursor.fetchall()]
     return question_ids
+
+
+@connection.connection_handler
+def add_user(cursor, username, plain_text_password):
+    password = util.hash_password(plain_text_password)
+    current_date = util.get_time()
+    cursor.execute(("""
+                    INSERT INTO user
+                    (username, password, reputation, registration_date)
+                    VALUES (%(username)s, %(password)s, 0, %(registration_date)s)
+                   """), dict(username=username, password=password, registration_date=current_date))

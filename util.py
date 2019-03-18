@@ -5,7 +5,6 @@ import os
 import bcrypt
 
 
-
 def get_time():
     dt = datetime.now().replace(second=0, microsecond=0)
     return dt
