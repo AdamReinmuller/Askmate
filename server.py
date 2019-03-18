@@ -90,7 +90,7 @@ def route_question(question_id):
     answers = data_manager.get_lines_data_by_foreign_id(data_manager.answer_db, 'question_id', question_id)
     filename_q = '/static/image_for_question' + str(question_id) + '.png'
     image_q = util.check_file(filename_q.lstrip("/"))
-    tags = util.get_tags(question_id)
+    tags = data_manager.get_tags(question_id)
     answer_ids = {}
     for answer in answers:
         answer_ids[answer['id']] = [util.check_file('static/image_for_answer' + str(answer['id']) + '.png'),
@@ -189,7 +189,7 @@ def add_edit_question(question_id=None):
 
     else:
         data_manager.add_question(request.form['question_title'], request.form['question'])
-        question_id = util.get_last_question_id()
+        question_id = data_manager.get_last_question_id()
         return redirect('/question/{}'.format(question_id))
 
 
@@ -198,7 +198,7 @@ def add_tag_to_question(question_id=None):
     if request.method == 'GET':
         question = data_manager.get_question_by_id(question_id)
         question_title = question[0]['title']
-        tags = util.get_tags(question_id)
+        tags = data_manager.get_tags(question_id)
         return render_template('add_tag.html', question_title=question_title, tags=tags, question_id=question_id)
     else:
         question = data_manager.get_question_by_id(question_id)
