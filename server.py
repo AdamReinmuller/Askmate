@@ -264,5 +264,13 @@ def search():
                            headers=headers, search_phrase=search_phrase)
 
 
+@app.route('/tags')
+def tag_page():
+    data = data_manager.get_tags_and_question_count()
+    return render_template('all_tags.html', data=data)
+
+
+
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000, host='0.0.0.0')

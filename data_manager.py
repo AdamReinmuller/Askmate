@@ -353,3 +353,15 @@ def get_five_latest_submitted_titles_with_ids_from_table(cursor, table):
                    """).format(table=sql.Identifier(table)))
     five_latest_titles_with_ids_from_table = cursor.fetchall()
     return five_latest_titles_with_ids_from_table
+
+@connection.connection_handler
+def get_tags_and_question_count(cursor):
+    cursor.execute('''SELECT tag.id, tag.name, COUNT(question_id) FROM tag JOIN question_tag
+                        ON tag.id = question_tag.tag_id
+                        GROUP BY tag.id
+                        ORDER BY tag.id''')
+    data = cursor.fetchall()
+    return data
+
+if __name__ == '__main__':
+    print(get_tags_and_question_count())
