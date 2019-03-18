@@ -1,26 +1,29 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>{{'Edit Answer' if answer_id else 'Post Answer'}}</title>
+    <meta charset="UTF-8">
+    <title>{{ 'Edit Answer' if answer_id else 'Post Answer' }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='icons/Askmate.ico') }}">
 </head>
 <body>
-    <h1>{{'Edit Answer' if answer_id else 'Post Answer'}}</h1>
+<h1>{{ 'Edit Answer' if answer_id else 'Post Answer' }}</h1>
 
-    {% if answer_id %}
-        <h4><a href="/">Back to Main page</a></h4>
-        <form method="POST" >
-            <p><strong> Question title: {{ question_title }} </strong></p>
-            <p><textarea name="answer_message" rows="10" cols="70" required>{{ answer['message'] }}</textarea></p>
-            <input type="submit" value="Edit Answer" >
-        </form>
+{% if answer_id %}
+    <h4><a href="/">Back to Main page</a></h4>
+    <form method="POST">
+        <p><strong> Question title: {{ question_title }} </strong></p>
+        <p><textarea name="answer_message" rows="10" cols="70" required>{{ answer['message'] }}</textarea></p>
+        <input type="submit" value="Edit Answer">
+    </form>
 
-    {% else %}
-        <h4><a href="/">Back to Main page</a></h4>
-        <form method="POST" >
-            <p><strong> Question title: {{ question_title }} </strong></p>
-            <p><textarea name="answer_message" rows="10" cols="70" minlength="10" required></textarea></p>
-            <p><input type="submit" value="Post Answer"></p>
-        </form>
-    {% endif %}
+{% else %}
+    <h4><a href="/">Back to Main page</a></h4>
+    <form method="POST">
+        <p><strong> Question title: {{ question_title }} </strong></p>
+        <p><textarea name="answer_message" rows="10" cols="70" minlength="10" required></textarea></p>
+        <p><input type="submit" value="Post Answer"></p>
+    </form>
+{% endif %}
 </body>
 </html>

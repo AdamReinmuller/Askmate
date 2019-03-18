@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title> {{'Edit Question' if question_id else 'Add Question'}} </title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='icons/Askmate.ico') }}">
 </head>
 <body>
     <h1>{{'Edit Question' if question_id else 'Add Question'}}</h1>
