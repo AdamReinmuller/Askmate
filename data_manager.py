@@ -170,7 +170,7 @@ def change_vote_number_in_table(cursor, table, id_, method):
 @connection.connection_handler
 def add_tag_to_question(cursor, question_id, tag):
     cursor.execute('''SELECT * FROM tag
-                    WHERE name = %(tag)s''', {'tag':tag})
+                    WHERE name = %(tag)s''', {'tag': tag})
     on_the_table = cursor.fetchall()
     if not on_the_table:
         cursor.execute('''INSERT INTO tag (name) VALUES (%(tag)s);
@@ -184,17 +184,16 @@ def add_tag_to_question(cursor, question_id, tag):
                        , {'question_id': question_id, 'tag_id': tag_id})
     elif on_the_table:
         cursor.execute('''SELECT id FROM tag
-        WHERE name = %(tag)s''', {'tag':tag})
+        WHERE name = %(tag)s''', {'tag': tag})
         tag_id = cursor.fetchone()['id']
         cursor.execute('''SELECT * FROM question_tag
                           WHERE tag_id=%(tag_id)s AND question_id=%(question_id)s''',
-                          {'question_id':question_id, 'tag_id':tag_id})
+                       {'question_id': question_id, 'tag_id': tag_id})
         existing_question_tag_connection = cursor.fetchall()
         if not existing_question_tag_connection:
             cursor.execute('''INSERT INTO question_tag
                               VALUES (%(question_id)s, %(tag_id)s)''',
-                              {'question_id': question_id, 'tag_id': tag_id})
-
+                           {'question_id': question_id, 'tag_id': tag_id})
 
 
 @connection.connection_handler
@@ -236,8 +235,7 @@ def search_answers(cursor, search_phrase):
     return answers
 
 
-
-#zsuzsi
+# zsuzsi
 
 
 @connection.connection_handler
@@ -245,7 +243,8 @@ def get_foreign_key_by_id(cursor, table, foreign_key_name, id):
     cursor.execute(sql.SQL("""
                     SELECT {foreign_key_name} FROM {table}
                     WHERE id = %(id)s
-                   """).format(table=sql.Identifier(table), foreign_key_name=sql.Identifier(foreign_key_name)), {'id': id})
+                   """).format(table=sql.Identifier(table), foreign_key_name=sql.Identifier(foreign_key_name)),
+                   {'id': id})
     title = cursor.fetchall()
     return title
 
@@ -271,13 +270,15 @@ def get_comments_data_by_foreign_id(cursor, foreign_id_name, id):
     comments_data = cursor.fetchall()
     return comments_data
 
+
 @connection.connection_handler
 def get_lines_data_by_foreign_id(cursor, table, foreign_id_name, id):
     cursor.execute(sql.SQL("""
                     SELECT * FROM {table}
                     WHERE {foreign_id_name} = %(id)s
                     ORDER BY submission_time DESC;
-                   """).format(table=sql.Identifier(table), foreign_id_name=sql.Identifier(foreign_id_name)), {'id': id})
+                   """).format(table=sql.Identifier(table), foreign_id_name=sql.Identifier(foreign_id_name)),
+                   {'id': id})
     lines_data = cursor.fetchall()
     return lines_data
 
@@ -290,30 +291,34 @@ def add_comment_to_table(cursor, table, id_type, id, message, submission_time, e
                    """).format(table=sql.Identifier(table), id_type=sql.Identifier(id_type)),
                    {'id': id, 'message': message, 'submission_time': submission_time, 'edited_count': edited_count})
 
+
 @connection.connection_handler
 def delete_line_by_id(cursor, table, id):
- cursor.execute(sql.SQL("""
+    cursor.execute(sql.SQL("""
                             DELETE FROM {table}
                             WHERE id = %(id)s;
                            """).format(table=sql.Identifier(table)),
-                           {'id': id})
+                   {'id': id})
+
 
 @connection.connection_handler
 def delete_line_by_foreign_id(cursor, table, foreign_id_name, foreign_id):
- cursor.execute(sql.SQL("""
+    cursor.execute(sql.SQL("""
                             DELETE FROM {table}
                             WHERE {foreign_id_name} = %(foreign_id)s;
                            """).format(table=sql.Identifier(table), foreign_id_name=sql.Identifier(foreign_id_name)),
-                           {'foreign_id': foreign_id})
+                   {'foreign_id': foreign_id})
+
 
 @connection.connection_handler
 def update_comment_message_submt_editedc_by_id(cursor, id, message, submission_time):
- cursor.execute(sql.SQL("""
+    cursor.execute(sql.SQL("""
                             UPDATE comment
                             SET edited_count = edited_count+1, message=%(message)s , submission_time=%(submission_time)s
                             WHERE id = %(id)s;
-                           """).format(message=sql.Identifier(message), submission_time=sql.Identifier(str(submission_time))),
-                           {'message': message, 'submission_time': submission_time, 'id': id})
+                           """).format(message=sql.Identifier(message),
+                                       submission_time=sql.Identifier(str(submission_time))),
+                   {'message': message, 'submission_time': submission_time, 'id': id})
 
 
 @connection.connection_handler
@@ -322,7 +327,7 @@ def get_ids_by_foreign_id(cursor, table, foreign_id_name, foreign_id):
                         SELECT id FROM {table}
                         WHERE {foreign_id_name} = %(foreign_id)s
                        """).format(table=sql.Identifier(table), foreign_id_name=sql.Identifier(foreign_id_name)),
-                        {'foreign_id': foreign_id})
+                   {'foreign_id': foreign_id})
     ids = cursor.fetchall()
     return ids
 
@@ -344,6 +349,7 @@ def update_view_number_in_question_by_id(cursor, id):
                       WHERE id = %(id)s
                         """, {'id': id})
 
+
 @connection.connection_handler
 def get_five_latest_submitted_titles_with_ids_from_table(cursor, table):
     cursor.execute(sql.SQL("""
@@ -353,3 +359,32 @@ def get_five_latest_submitted_titles_with_ids_from_table(cursor, table):
                    """).format(table=sql.Identifier(table)))
     five_latest_titles_with_ids_from_table = cursor.fetchall()
     return five_latest_titles_with_ids_from_table
+
+
+@connection.connection_handler
+def get_last_question_id(cursor):
+    cursor.execute('''SELECT id FROM question ORDER BY ID DESC LIMIT 1''')
+    last_question_id = cursor.fetchone()
+    return last_question_id['id']
+
+
+@connection.connection_handler
+def get_tags(cursor, id_=None):
+    try:
+        cursor.execute('''  SELECT tag_id FROM question_tag
+                            WHERE question_id = %(id_)s''', {'id_': id_})
+        tags_id = tuple(id['tag_id'] for id in cursor.fetchall())
+        cursor.execute('''  SELECT name, id FROM tag
+                            WHERE id IN %(tags_id)s''', {'tags_id': tags_id})
+        tags_dict = cursor.fetchall()
+        return tags_dict
+    except:
+        return False
+
+
+@connection.connection_handler
+def get_questions_by_tag(cursor, tag_id):
+    cursor.execute('''SELECT question_id FROM question_tag
+                      WHERE tag_id=%(tag_id)s''', {'tag_id': tag_id})
+    question_ids = [id['question_id'] for id in cursor.fetchall()]
+    return question_ids
