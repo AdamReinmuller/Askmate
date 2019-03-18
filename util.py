@@ -3,6 +3,8 @@ from datetime import datetime
 import urllib.request
 import connection
 import os
+import bcrypt
+
 
 @connection.connection_handler
 def get_last_question_id(cursor):
@@ -45,3 +47,14 @@ def delete_file(filename):
 
 def check_file(filename):
     return os.path.exists(filename)
+
+
+def hash_password(plain_text_password):
+    # By using bcrypt, the salt is saved into the hash itself
+    hashed_bytes = bcrypt.hashpw(plain_text_password.encode('utf-8'), bcrypt.gensalt())
+    return hashed_bytes.decode('utf-8')
+
+
+def verify_password(plain_text_password, hashed_password):
+    hashed_bytes_password = hashed_password.encode('utf-8')
+    return bcrypt.checkpw(plain_text_password.encode('utf-8'), hashed_bytes_password)
