@@ -434,5 +434,8 @@ def get_hashpw_of_username(cursor, username):
                         SELECT password FROM users
                         WHERE username = %(username)s
                        """, {'username': username})
-    hashpw = cursor.fetchone()['password']
-    return hashpw
+    try:
+        hashpw = cursor.fetchone()['password']
+        return hashpw
+    except:
+        return False
