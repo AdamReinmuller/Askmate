@@ -264,15 +264,20 @@ def search():
                            headers=headers, search_phrase=search_phrase)
 
 
+@app.route('/registration', methods=['GET', 'POST'])
 def register():
     if request.method == 'GET':
         return render_template('registration.html')
     elif request.method == 'POST':
         username = request.form['username']
-
+        users_table = data_manager.import_from_db(data_manager.users_db)
         password = util.hash_password(request.form['password'])
-        data_manager.register_user(username, password)
-        return redirect('/')
+        try:
+            data_manager.register_user(username, password)
+            return redirect('/')
+        except:
+            invalid_username = 'Username is taken'
+            return render_template('registration.html')
 
 
 if __name__ == '__main__':

@@ -13,6 +13,9 @@
         <input type="text" name="username"><br>
         <p>Password</p>
         <input type="text" name="password"><br>
+        {% if invalid_username %}
+            {{ invalid_username }}
+        <p id="invalid_username"> {% endif %} </p>
         <input type="submit" value="Register">
     </form>
 </body>
