@@ -3,12 +3,14 @@
     <title>
         Add tag to question
     </title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='icons/Askmate.ico') }}">
 </head>
 <body>
     <h1>{{ question_title }}</h1>
     {% if tags %}
         {% for tag in tags %}
-        <h1>#{{ tag['name'] }}<a href="/question/{{ question_id }}/{{ tag['id'] }}/delete-tag">x</a> </h1>
+            <h1><a href="/tags/{{ tag['name'] }}">#{{ tag['name'] }}</a><a href="/question/{{ question_id }}/{{ tag['id'] }}/delete-tag">x</a></h1>
         {% endfor %}
     {% endif %}
     <form method="post">

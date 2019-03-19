@@ -236,7 +236,8 @@ def search_answers(cursor, search_phrase):
     return answers
 
 
-# zsuzsi
+
+#zsuzsi
 
 
 @connection.connection_handler
@@ -244,8 +245,7 @@ def get_foreign_key_by_id(cursor, table, foreign_key_name, id):
     cursor.execute(sql.SQL("""
                     SELECT {foreign_key_name} FROM {table}
                     WHERE id = %(id)s
-                   """).format(table=sql.Identifier(table), foreign_key_name=sql.Identifier(foreign_key_name)),
-                   {'id': id})
+                   """).format(table=sql.Identifier(table), foreign_key_name=sql.Identifier(foreign_key_name)), {'id': id})
     title = cursor.fetchall()
     return title
 
@@ -278,8 +278,7 @@ def get_lines_data_by_foreign_id(cursor, table, foreign_id_name, id):
                     SELECT * FROM {table}
                     WHERE {foreign_id_name} = %(id)s
                     ORDER BY submission_time DESC;
-                   """).format(table=sql.Identifier(table), foreign_id_name=sql.Identifier(foreign_id_name)),
-                   {'id': id})
+                   """).format(table=sql.Identifier(table), foreign_id_name=sql.Identifier(foreign_id_name)), {'id': id})
     lines_data = cursor.fetchall()
     return lines_data
 
@@ -334,12 +333,12 @@ def get_ids_by_foreign_id(cursor, table, foreign_id_name, foreign_id):
 
 
 @connection.connection_handler
-def update_image_data_by_id(cursor, table, id, filename):
+def update_image_data_by_id(cursor, table, id, new_data):
     cursor.execute(sql.SQL("""UPDATE {table}
-                      SET image = %(filename)s
+                      SET image = %(new_data)s
                       WHERE id = %(id)s
                         """).format(table=sql.Identifier(table)),
-                   dict(id=id, filename=filename)
+                   dict(id=id, new_data=new_data)
                    )
 
 
@@ -360,6 +359,27 @@ def get_five_latest_submitted_titles_with_ids_from_table(cursor, table):
                    """).format(table=sql.Identifier(table)))
     five_latest_titles_with_ids_from_table = cursor.fetchall()
     return five_latest_titles_with_ids_from_table
+
+@connection.connection_handler
+def get_tags_and_question_count(cursor):
+    cursor.execute('''SELECT tag.id, tag.name, COUNT(question_id) FROM tag JOIN question_tag
+                        ON tag.id = question_tag.tag_id
+                        GROUP BY tag.id
+                        ORDER BY tag.id''')
+    data = cursor.fetchall()
+    return data
+
+@connection.connection_handler
+def get_questions_by_tag(cursor, tag_name):
+    cursor.execute('''SELECT question.*
+                      FROM tag JOIN question_tag ON tag.id = question_tag.tag_id
+                      JOIN question ON question_tag.question_id = question.id
+                      WHERE tag.name = %(tag_name)s''', {'tag_name':tag_name})
+    data = cursor.fetchall()
+    return data
+
+if __name__ == '__main__':
+    print(get_tags_and_question_count())
 
 
 @connection.connection_handler

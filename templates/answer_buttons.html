@@ -10,19 +10,27 @@
             </td>
             <td>
                 <a href="/question/{{ question_id }}/{{ answer['id'] }}/answer/up">
-                    <img src='{{ url_for('static', filename='voteup.png') }}' alt="here should be vote up image"
+                    <img src='{{ url_for('static', filename='icons/voteup.png') }}' alt="here should be vote up image"
                          width="40" height="40">
                 </a><br>
             </td>
             <td>
                 <a href="/question/{{ question_id }}/{{ answer['id'] }}/answer/down">
-                    <img src='{{ url_for('static', filename='votedown.png') }}' alt="here should be vote down image"
+                    <img src='{{ url_for('static', filename='icons/votedown.png') }}'
+                         alt="here should be vote down image"
                          width="40" height="40">
                 </a><br>
             </td>
             <td>
                 <a href="/answer/{{ answer['id'] }}/new-comment">Add comment</a><br>
             </td>
+            {% if answer_ids[answer['id']][0] == True %}
+                <td>
+                    <a href="/question/{{ question_id }}/{{ answer['id'] }}/delete-image">Delete image</a>
+                </td>
+            {% else %}
+                <td><a href="/question/{{ question_id }}/{{ answer['id'] }}/add-image">Add image</a></td>
+            {% endif %}
         </tr>
     </table>
 </div>

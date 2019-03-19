@@ -13,13 +13,14 @@
             </td>
             <td>
                 <a href="/question/{{ question_id }}/{{ question_id }}/question/up">
-                    <img src='{{ url_for('static', filename='voteup.png') }}' alt="here should be vote up image"
+                    <img src='{{ url_for('static', filename='icons/voteup.png') }}' alt="here should be vote up image"
                          width="40" height="40">
                 </a><br>
             </td>
             <td>
                 <a href="/question/{{ question_id }}/{{ question_id }}/question/down">
-                    <img src='{{ url_for('static', filename='votedown.png') }}' alt="here should be vote down image"
+                    <img src='{{ url_for('static', filename='icons/votedown.png') }}'
+                         alt="here should be vote down image"
                          width="40" height="40">
                 </a><br>
             </td>
@@ -29,6 +30,15 @@
             <td>
                 <a href="/question/{{ question_id }}/add-tag">Add tag</a><br>
             </td>
+            {% if image_q %}
+                <td>
+                    <a href="/question/{{ a_ques['id'] }}/delete-image">Delete image</a>
+                </td>
+            {% else %}
+                <td>
+                    <a href="/question/{{ a_ques['id'] }}/add-image">Add image</a>
+                </td>
+            {% endif %}
         </tr>
     </table>
 </div>
