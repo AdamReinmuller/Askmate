@@ -363,5 +363,14 @@ def get_tags_and_question_count(cursor):
     data = cursor.fetchall()
     return data
 
+@connection.connection_handler
+def get_questions_by_tag(cursor, tag_name):
+    cursor.execute('''SELECT question.*
+                      FROM tag JOIN question_tag ON tag.id = question_tag.tag_id
+                      JOIN question ON question_tag.question_id = question.id
+                      WHERE tag.name = %(tag_name)s''', {'tag_name':tag_name})
+    data = cursor.fetchall()
+    return data
+
 if __name__ == '__main__':
     print(get_tags_and_question_count())

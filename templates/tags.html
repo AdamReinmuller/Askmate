@@ -3,7 +3,7 @@
         <ul>
         {% for tag in tags %}
             <li>
-            #{{ tag['name'] }}<a href="/question/{{ question_id }}/{{ tag['id'] }}/delete-tag">x</a>
+                <a href="/tags/{{ tag['name'] }}">#{{ tag['name'] }}</a><a href="/question/{{ question_id }}/{{ tag['id'] }}/delete-tag">x</a>
             </li>
         {% endfor %}
         </ul>

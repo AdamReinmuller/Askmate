@@ -270,6 +270,13 @@ def tag_page():
     return render_template('all_tags.html', data=data)
 
 
+@app.route('/tags/<string:tag_name>')
+def get_qestions_by_tag(tag_name):
+    headers = data_manager.get_column_names_of_table(data_manager.question_db)
+    questions = data_manager.get_questions_by_tag(tag_name)
+    return render_template('questions_by_tag.html', questions=questions, headers=headers, tag_name=tag_name)
+
+
 
 
 if __name__ == '__main__':
