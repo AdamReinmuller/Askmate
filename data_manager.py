@@ -426,3 +426,13 @@ def get_userid_by_username(cursor, username):
                        """, {'username': username})
     id = cursor.fetchone()['id']
     return id
+
+
+@connection.connection_handler
+def get_hashpw_of_username(cursor, username):
+    cursor.execute("""
+                        SELECT password FROM users
+                        WHERE username = %(username)s
+                       """, {'username': username})
+    hashpw = cursor.fetchone()['hashpw']
+    return hashpw
