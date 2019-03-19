@@ -7,6 +7,7 @@ answer_db = 'answer'
 comment_db = 'comment'
 tag_db = 'tag'
 question_tag_db = 'question_tag'
+users_db = 'users'
 
 
 @connection.connection_handler
