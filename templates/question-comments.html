@@ -20,7 +20,7 @@
                 <td>{{ comment['submission_time'] }}</td>
                 <td>
                     <a href="/comments/{{ comment['id'] }}/delete" onclick="return confirm('Are you sure?')">
-                        <img src='{{ url_for('static', filename='recycle_bin.png') }}'
+                        <img src='{{ url_for('static', filename='icons/recycle_bin.png') }}'
                              alt="here should be recycle bin image"
                              width="40" height="40">
                     </a>

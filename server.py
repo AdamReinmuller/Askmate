@@ -137,6 +137,7 @@ def add_image_a(question_id, answer_id):
 def delete_question_image(question_id):
     filename = 'static/image_for_question' + str(question_id) + '.png'
     util.delete_file(filename)
+    data_manager.update_image_data_by_id(data_manager.question_db, question_id, 'no image')
     return redirect('/question/{}'.format(question_id))
 
 
@@ -144,6 +145,7 @@ def delete_question_image(question_id):
 def delete_answer_image(question_id, answer_id):
     filename = 'static/image_for_answer' + str(answer_id) + '.png'
     util.delete_file(filename)
+    data_manager.update_image_data_by_id(data_manager.answer_db, answer_id, 'no image')
     return redirect('/question/{}'.format(question_id))
 
 
@@ -262,6 +264,21 @@ def search():
     answers = data_manager.search_answers(search_phrase)
     return render_template('search_results.html', questions=questions, answers=answers,
                            headers=headers, search_phrase=search_phrase)
+
+
+@app.route('/tags')
+def tag_page():
+    data = data_manager.get_tags_and_question_count()
+    return render_template('all_tags.html', data=data)
+
+
+@app.route('/tags/<string:tag_name>')
+def get_qestions_by_tag(tag_name):
+    headers = data_manager.get_column_names_of_table(data_manager.question_db)
+    questions = data_manager.get_questions_by_tag(tag_name)
+    return render_template('questions_by_tag.html', questions=questions, headers=headers, tag_name=tag_name)
+
+
 
 
 if __name__ == '__main__':
