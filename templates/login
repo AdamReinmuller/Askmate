@@ -11,12 +11,12 @@
         <h1>Login</h1>
         <p>Username</p>
         <input type="text" name="username"><br>
-        {% if invalid_username %}
-            <p id="invalid_username_or_password">{{ invalid_username_or_password }}</p>
-        {% endif %}
         <p>Password</p>
         <input type="password" name="password"><br>
         <input type="submit" value="Login">
+        {% if invalid_username_or_password %}
+            <p id="invalid_username_or_password">{{ invalid_username_or_password }}</p>
+        {% endif %}
     </form>
 </body>
 </html>

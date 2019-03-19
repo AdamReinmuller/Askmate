@@ -30,4 +30,5 @@ def hash_password(plain_text_password):
 
 def verify_password(plain_text_password, hashed_password):
     hashed_bytes_password = hashed_password.encode('utf-8')
-    return bcrypt.checkpw(plain_text_password.encode('utf-8'), hashed_bytes_password)
+    value = bcrypt.checkpw(plain_text_password.encode('utf-8'), hashed_bytes_password)
+    return value

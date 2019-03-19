@@ -276,7 +276,7 @@ def register():
         return render_template('registration.html')
     elif request.method == 'POST':
         username = request.form['username']
-        password = util.hash_password(request.form['password'])
+        password = request.form['password']
         try:
             data_manager.register_user(username, password)
             return redirect('/')
@@ -289,7 +289,7 @@ def register():
 def login():
     if request.method == 'POST':
         good_hash_pw = data_manager.get_hashpw_of_username(request.form['username'])
-        if util.verify_password(request.form['password'], good_hash_pw):
+        if good_hash_pw and util.verify_password(request.form['password'], good_hash_pw):
             session['username'] = request.form['username']
             return redirect('/')
         else:
@@ -297,6 +297,12 @@ def login():
             return render_template('login', invalid_username_or_password=invalid_username_or_password)
     elif request.method == 'GET':
         return render_template('login')
+
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    return redirect('/')
 
 
 if __name__ == '__main__':
