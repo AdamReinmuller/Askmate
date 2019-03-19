@@ -1,8 +1,9 @@
-from flask import Flask, request, render_template, redirect, session
+from flask import Flask, request, render_template, redirect, session, escape
 import util
 import data_manager
 
 app = Flask(__name__)
+app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
 
 @app.route('/')
@@ -267,6 +268,21 @@ def search():
     answers = data_manager.search_answers(search_phrase)
     return render_template('search_results.html', questions=questions, answers=answers,
                            headers=headers, search_phrase=search_phrase)
+
+
+@app.route('/registration', methods=['GET', 'POST'])
+def register():
+    if request.method == 'GET':
+        return render_template('registration.html')
+    elif request.method == 'POST':
+        username = request.form['username']
+        password = util.hash_password(request.form['password'])
+        try:
+            data_manager.register_user(username, password)
+            return redirect('/')
+        except:
+            invalid_username = 'Username is taken'
+            return render_template('registration.html', invalid_username=invalid_username)
 
 
 if __name__ == '__main__':
