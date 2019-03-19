@@ -403,8 +403,17 @@ def get_tags(cursor, id_=None):
 
 
 @connection.connection_handler
-def get_questions_by_tag(cursor, tag_id):
-    cursor.execute('''SELECT question_id FROM question_tag
-                      WHERE tag_id=%(tag_id)s''', {'tag_id': tag_id})
-    question_ids = [id['question_id'] for id in cursor.fetchall()]
-    return question_ids
+def get_questions_by_tag(cursor, tag_name):
+    cursor.execute('''SELECT question.*
+                      FROM tag JOIN question_tag ON tag.id = question_tag.tag_id
+                      JOIN question ON question_tag.question_id = question.id
+                      WHERE tag.name = %(tag_name)s''', {'tag_name':tag_name})
+    data = cursor.fetchall()
+    return data
+
+
+@connection.connection_handler
+def update_reputation(cursor, quantity, user_id):
+    cursor.execute('''UPDATE users
+                      SET reputation = reputation + %(quantity)s
+                      WHERE id = %(user_id)s''', {'quantity':quantity, 'user_id':user_id})
