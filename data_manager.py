@@ -395,7 +395,7 @@ def register_user(cursor, username, plain_text_password):
     password = util.hash_password(plain_text_password)
     current_date = util.get_time()
     cursor.execute(("""
-                    INSERT INTO user
+                    INSERT INTO users
                     (username, password, reputation, registration_date)
                     VALUES (%(username)s, %(password)s, 0, %(registration_date)s)
                    """), dict(username=username, password=password, registration_date=current_date))
