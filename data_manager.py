@@ -332,12 +332,12 @@ def get_ids_by_foreign_id(cursor, table, foreign_id_name, foreign_id):
 
 
 @connection.connection_handler
-def update_image_data_by_id(cursor, table, id, filename):
+def update_image_data_by_id(cursor, table, id, new_data):
     cursor.execute(sql.SQL("""UPDATE {table}
-                      SET image = %(filename)s
+                      SET image = %(new_data)s
                       WHERE id = %(id)s
                         """).format(table=sql.Identifier(table)),
-                   dict(id=id, filename=filename)
+                   dict(id=id, new_data=new_data)
                    )
 
 

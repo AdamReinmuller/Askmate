@@ -23,14 +23,13 @@
         <tr>
             {% for key, value in a_ques.items() %}
                 {% if key == 'image' %}
-                    {% if image_q %}
-                        <td>
+                    <td>
+                        {% if image_q %}
                             <img src='{{ filename_q }}' alt="here should be an image" width="40" height="40"><br>
-                            <a href="/question/{{ a_ques['id'] }}/delete-image">Delete image</a>
-                        </td>
-                    {% else %}
-                        <td><a href="/question/{{ a_ques['id'] }}/add-image">Add image</a></td>
-                    {% endif %}
+                        {% else %}
+                            {{ value }}
+                        {% endif %}
+                    </td>
                 {% else %}
                     <td>{{ value }}</td>
                 {% endif %}
@@ -38,8 +37,10 @@
         </tr>
     {% endfor %}
 </table>
-{% include 'question-comments.html' %}
-{% include 'question_buttons.html' %}
+ {% for a_ques in question %}
+ {% include 'question-comments.html' %}
+        {% include 'question_buttons.html' %}
+   {% endfor %}
 
 {% if answers != [] %}
     <h3>Answers to the Question:</h3>

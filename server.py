@@ -137,6 +137,7 @@ def add_image_a(question_id, answer_id):
 def delete_question_image(question_id):
     filename = 'static/image_for_question' + str(question_id) + '.png'
     util.delete_file(filename)
+    data_manager.update_image_data_by_id(data_manager.question_db, question_id, 'no image')
     return redirect('/question/{}'.format(question_id))
 
 
@@ -144,6 +145,7 @@ def delete_question_image(question_id):
 def delete_answer_image(question_id, answer_id):
     filename = 'static/image_for_answer' + str(answer_id) + '.png'
     util.delete_file(filename)
+    data_manager.update_image_data_by_id(data_manager.answer_db, answer_id, 'no image')
     return redirect('/question/{}'.format(question_id))
 
 

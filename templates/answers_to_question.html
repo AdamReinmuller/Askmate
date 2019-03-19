@@ -6,21 +6,20 @@
             {% endfor %}
         </tr>
         <tr>
-        {% for item in answer %}
-
-            {% if item == 'image' %}
-                {% if answer_ids[answer['id']][0] == True %}
+            {% for item in answer %}
+                {% if item == 'image' %}
                     <td>
-                        <img src='{{ answer_ids[answer['id']][1] }}' alt="here should be an image" width="40" height="40"><br>
-                        <a href="/question/{{ question_id }}/{{ answer['id'] }}/delete-image">Delete image</a>
+                        {% if answer_ids[answer['id']][0] == True %}
+                            <img src='{{ answer_ids[answer['id']][1] }}' alt="here should be an image" width="40"
+                                 height="40"><br>
+                        {% else %}
+                            {{ answer[item] }}
+                        {% endif %}
                     </td>
                 {% else %}
-                    <td><a href="/question/{{ question_id }}/{{ answer['id'] }}/add-image">Add image</a></td>
+                    <td>{{ answer[item] }}</td>
                 {% endif %}
-            {% else %}
-                <td>{{ answer[item] }}</td>
-            {% endif %}
-        {% endfor %}
+            {% endfor %}
         </tr>
     </table>
 
