@@ -10,12 +10,12 @@
     <form id="registration_form" method="post">
         <h1>Register account</h1>
         <p>Username</p>
-        <input type="text" name="username"><br>
-        <p>Password</p>
-        <input type="text" name="password"><br>
+        <input type="text" minlength="4" name="username"><br>
         {% if invalid_username %}
-            {{ invalid_username }}
-        <p id="invalid_username"> {% endif %} </p>
+            <p id="invalid_username">{{ invalid_username }}</p>
+        {% endif %}
+        <p>Password</p>
+        <input type="password" minlength="6" name="password"><br>
         <input type="submit" value="Register">
     </form>
 </body>

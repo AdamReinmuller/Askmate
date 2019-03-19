@@ -277,7 +277,7 @@ def register():
             return redirect('/')
         except:
             invalid_username = 'Username is taken'
-            return render_template('registration.html')
+            return render_template('registration.html', invalid_username=invalid_username)
 
 
 if __name__ == '__main__':
