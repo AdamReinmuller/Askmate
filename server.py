@@ -1,8 +1,9 @@
-from flask import Flask, request, render_template, redirect, session
+from flask import Flask, request, render_template, redirect, session, escape
 import util
 import data_manager
 
 app = Flask(__name__)
+app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
 
 @app.route('/')
@@ -270,7 +271,6 @@ def register():
         return render_template('registration.html')
     elif request.method == 'POST':
         username = request.form['username']
-        users_table = data_manager.import_from_db(data_manager.users_db)
         password = util.hash_password(request.form['password'])
         try:
             data_manager.register_user(username, password)
