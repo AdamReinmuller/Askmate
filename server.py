@@ -8,9 +8,10 @@ app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
 @app.route('/')
 def index():
+    user_id = 1  #data_manager.get_userid_by_username(session['username'])
     questions = data_manager.get_five_latest_submitted_titles_with_ids_from_table('question')
     header = data_manager.get_column_names_of_table(data_manager.question_db)[4]
-    return render_template('index.html', questions=questions, header=header)
+    return render_template('index.html', questions=questions, header=header, user_id=user_id)
 
 
 @app.route('/list')
@@ -80,6 +81,51 @@ def edit_comment(comment_id):
                 'question_id']
         data_manager.update_comment_message_submt_editedc_by_id(comment_id, request.form['comment'], util.get_time())
         return redirect('/question/{}'.format(question_id))
+
+
+
+
+
+@app.route('/user/<int:user_id>')
+def route_user(user_id):
+
+
+
+    question = data_manager.get_line_data_by_id(data_manager.question_db, question_id)
+    headers_q = data_manager.get_column_names_of_table(data_manager.question_db)
+    headers_c = data_manager.get_column_names_of_table(data_manager.comment_db)[3:5]
+    headers_a = data_manager.get_column_names_of_table(data_manager.answer_db)
+    comments_q = data_manager.get_comments_data_by_foreign_id('question_id', question_id)
+    answers = data_manager.get_lines_data_by_foreign_id(data_manager.answer_db, 'question_id', question_id)
+    filename_q = '/static/image_for_question' + str(question_id) + '.png'
+    image_q = util.check_file(filename_q.lstrip("/"))
+    tags = data_manager.get_tags(question_id)
+    answer_ids = {}
+    for answer in answers:
+        answer_ids[answer['id']] = [util.check_file('static/image_for_answer' + str(answer['id']) + '.png'),
+                                    '/static/image_for_answer' + str(answer['id']) + '.png',
+                                    data_manager.get_lines_data_by_foreign_id(data_manager.comment_db, 'answer_id',
+                                                                              answer['id'])]
+    return render_template('question.html', question_id=question_id, question=question, headers_q=headers_q,
+                           comments_q=comments_q, headers_c=headers_c, answers=answers,
+                           headers_a=headers_a, image_q=image_q, filename_q=filename_q, answer_ids=answer_ids,
+                           tags=tags)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @app.route('/question/<int:question_id>')
