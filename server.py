@@ -264,5 +264,20 @@ def search():
                            headers=headers, search_phrase=search_phrase)
 
 
+@app.route('/tags')
+def tag_page():
+    data = data_manager.get_tags_and_question_count()
+    return render_template('all_tags.html', data=data)
+
+
+@app.route('/tags/<string:tag_name>')
+def get_qestions_by_tag(tag_name):
+    headers = data_manager.get_column_names_of_table(data_manager.question_db)
+    questions = data_manager.get_questions_by_tag(tag_name)
+    return render_template('questions_by_tag.html', questions=questions, headers=headers, tag_name=tag_name)
+
+
+
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000, host='0.0.0.0')

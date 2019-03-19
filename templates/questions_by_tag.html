@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Questions by #{{tag_name}}</title>
+</head>
+<body>
+<h1>Questions by #{{tag_name}}</h1>
+<h4><a href="/">Back to Main page</a></h4>
+<h4><a href="/add-question">Add new question</a></h4>
+<br>
+<table style="width:90%" border="1">
+    <tr>
+        {% for header in headers %}
+            <th>{{ header }} <br> <a href="/list/?order_by={{ header }}&order_direction=asc">↑</a> <a
+                    href="/list/?order_by={{ header }}&order_direction=desc">↓</a></th>
+        {% endfor %}
+        <th>Add new answer</th>
+        <th>Delete question</th>
+        <th>Edit question</th>
+    </tr>
+    {% for question in questions %}
+        <tr>
+            {% for key, value in question.items() %}
+                {% if key == 'title' %}
+                    <td>
+                        <a href="/question/{{ question['id'] }}/view_counter">{{ value }}</a>
+                    </td>
+                {% else %}
+                    <td>{{ value }}</td>
+                {% endif %}
+            {% endfor %}
+            <td>
+                <a href="/question/{{ question['id'] }}/new-answer">Add an answer</a>
+            </td>
+            <td>
+                <a href="/question/{{ question['id'] }}/delete" onclick="return confirm('Are you sure?')">Delete
+                    question</a>
+            </td>
+            <td>
+                <a href="/add-question/{{ question['id'] }}">Edit question</a>
+            </td>
+        </tr>
+    {% endfor %}
+</table>
+</body>
+</html>
