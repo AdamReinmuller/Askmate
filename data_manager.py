@@ -58,30 +58,30 @@ def sort_table(table, key="", sort=""):
 
 
 @connection.connection_handler
-def add_question(cursor, title, message):
+def add_question(cursor, title, message, users_id):
     """
     :return: writes to question_db
     """
     current_time = util.get_time()
     cursor.execute("""INSERT INTO question
-                      (submission_time, view_number, vote_number, title, message, image)
-                      VALUES ( %(submission_time)s, 0, 0, %(title)s, %(message)s, 'no image' )
+                      (submission_time, view_number, vote_number, title, message, image, users_id)
+                      VALUES ( %(submission_time)s, 0, 0, %(title)s, %(message)s, 'no image', %(users_id)s )
                     """,
-                   dict(submission_time=current_time, title=title, message=message)
+                   dict(submission_time=current_time, title=title, message=message, users_id=users_id)
                    )
 
 
 @connection.connection_handler
-def add_answer(cursor, question_id, message):
+def add_answer(cursor, question_id, message, users_id):
     """
     :return: writes to answer_db
     """
     current_time = util.get_time()
     cursor.execute("""INSERT INTO answer
-                      (submission_time, vote_number, question_id, message, image)
-                      VALUES ( %(submission_time)s, 0, %(question_id)s, %(message)s, 'no image' )
+                      (submission_time, vote_number, question_id, message, image, users_id)
+                      VALUES ( %(submission_time)s, 0, %(question_id)s, %(message)s, 'no image', %(users_id)s)
                     """,
-                   dict(submission_time=current_time, question_id=question_id, message=message)
+                   dict(submission_time=current_time, question_id=question_id, message=message, users_id=users_id)
                    )
 
 
@@ -284,12 +284,12 @@ def get_lines_data_by_foreign_id(cursor, table, foreign_id_name, id):
 
 
 @connection.connection_handler
-def add_comment_to_table(cursor, table, id_type, id, message, submission_time, edited_count):
+def add_comment_to_table(cursor, table, id_type, id, message, submission_time, edited_count, users_id):
     cursor.execute(sql.SQL("""
-                    INSERT INTO {table} ({id_type}, message, submission_time, edited_count)
-                    VALUES (%(id)s, %(message)s, %(submission_time)s, %(edited_count)s)
+                    INSERT INTO {table} ({id_type}, message, submission_time, edited_count, users_id)
+                    VALUES (%(id)s, %(message)s, %(submission_time)s, %(edited_count)s, %(users_id)s)
                    """).format(table=sql.Identifier(table), id_type=sql.Identifier(id_type)),
-                   {'id': id, 'message': message, 'submission_time': submission_time, 'edited_count': edited_count})
+                   {'id': id, 'message': message, 'submission_time': submission_time, 'edited_count': edited_count, 'users_id': users_id})
 
 
 @connection.connection_handler
@@ -388,3 +388,13 @@ def get_questions_by_tag(cursor, tag_id):
                       WHERE tag_id=%(tag_id)s''', {'tag_id': tag_id})
     question_ids = [id['question_id'] for id in cursor.fetchall()]
     return question_ids
+
+
+@connection.connection_handler
+def get_userid_by_username(cursor, username):
+    cursor.execute("""
+                        SELECT id FROM users
+                        WHERE username = %(username)s
+                       """, {'username': username})
+    id = cursor.fetchone()['id']
+    return id

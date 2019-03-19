@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect
+from flask import Flask, request, render_template, redirect, session
 import util
 import data_manager
 
@@ -38,14 +38,15 @@ def add_comment(question_id=None, answer_id=None, comment=None, comment_id=-1):
                                    comment_id=comment_id)
 
     elif request.method == 'POST':
+        user_id = data_manager.get_userid_by_username(session['username'])
         if request.path.startswith("/q"):
             data_manager.add_comment_to_table(data_manager.comment_db, 'question_id', question_id,
-                                              request.form['comment'], util.get_time(), 0)
+                                              request.form['comment'], util.get_time(), 0, user_id)
         else:
             question_id = data_manager.get_foreign_key_by_id(data_manager.answer_db, 'question_id', answer_id)[0][
                 'question_id']
             data_manager.add_comment_to_table(data_manager.comment_db, 'answer_id', answer_id, request.form['comment'],
-                                              util.get_time(), 0)
+                                              util.get_time(), 0, user_id)
         return redirect('/question/{}'.format(question_id))
 
 
@@ -164,8 +165,9 @@ def post_answer(question_id, answer_id=""):
         return redirect('/question/{}'.format(question_id))
     else:
         if request.method == 'POST':
+            user_id = data_manager.get_userid_by_username(session['username'])
             form_answer = request.form['answer_message']
-            data_manager.add_answer(question_id, form_answer)
+            data_manager.add_answer(question_id, form_answer, user_id)
             return redirect('/question/{}'.format(question_id))
         else:
             single_question = data_manager.get_line_data_by_id(data_manager.question_db, question_id)
@@ -190,7 +192,8 @@ def add_edit_question(question_id=None):
         return render_template('add_questions.html', question_id=question_id)
 
     else:
-        data_manager.add_question(request.form['question_title'], request.form['question'])
+        user_id = data_manager.get_userid_by_username(session['username'])
+        data_manager.add_question(request.form['question_title'], request.form['question'], user_id)
         question_id = data_manager.get_last_question_id()
         return redirect('/question/{}'.format(question_id))
 
