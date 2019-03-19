@@ -285,5 +285,19 @@ def register():
             return render_template('registration.html', invalid_username=invalid_username)
 
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        good_hash_pw = data_manager.get_hashpw_of_username(request.form['username'])
+        if util.verify_password(request.form['password'], good_hash_pw):
+            session['username'] = request.form['username']
+            return redirect('/')
+        else:
+            invalid_username_or_password = 'invalid username or password'
+            return render_template('login', invalid_username_or_password=invalid_username_or_password)
+    elif request.method == 'GET':
+        return render_template('login')
+
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000, host='0.0.0.0')
