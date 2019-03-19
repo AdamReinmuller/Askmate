@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect
+from flask import Flask, request, render_template, redirect, session
 import util
 import data_manager
 
@@ -264,12 +264,12 @@ def search():
                            headers=headers, search_phrase=search_phrase)
 
 
-@app.route('/registration', methods=['GET', 'POST'])
 def register():
     if request.method == 'GET':
         return render_template('registration.html')
     elif request.method == 'POST':
         username = request.form['username']
+
         password = util.hash_password(request.form['password'])
         data_manager.register_user(username, password)
         return redirect('/')
