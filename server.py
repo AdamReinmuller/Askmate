@@ -264,5 +264,16 @@ def search():
                            headers=headers, search_phrase=search_phrase)
 
 
+@app.route('/registration', methods=['GET', 'POST'])
+def register():
+    if request.method == 'GET':
+        return render_template('registration.html')
+    elif request.method == 'POST':
+        username = request.form['username']
+        password = util.hash_password(request.form['password'])
+        data_manager.register_user(username, password)
+        return redirect('/')
+
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000, host='0.0.0.0')
