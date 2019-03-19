@@ -391,7 +391,7 @@ def get_questions_by_tag(cursor, tag_id):
 
 
 @connection.connection_handler
-def add_user(cursor, username, plain_text_password):
+def register_user(cursor, username, plain_text_password):
     password = util.hash_password(plain_text_password)
     current_date = util.get_time()
     cursor.execute(("""
