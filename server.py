@@ -95,6 +95,7 @@ def edit_comment(comment_id):
 
 @app.route('/user/<int:user_id>')
 def route_user(user_id):
+    user_reputation = data_manager.get_reputation_by_id(user_id)
     questions_of_user = data_manager.get_lines_data_by_foreign_id(data_manager.question_db, 'users_id', user_id)
     user_answers_questions = data_manager.get_answers_with_their_questions_by_foreign_id('users_id', user_id)
     question_comments = data_manager.get_question_comments_message_with_question_by_foreign_id('users_id', user_id)
@@ -104,7 +105,7 @@ def route_user(user_id):
     headers_a = data_manager.get_column_names_of_table(data_manager.answer_db)
     return render_template('user.html', questions_of_user=questions_of_user, user_answers_questions=user_answers_questions,
                            question_comments=question_comments, answer_comments=answer_comments,
-                           headers_q=headers_q, headers_a=headers_a, headers_c=headers_c, )
+                           headers_q=headers_q, headers_a=headers_a, headers_c=headers_c, reputation=user_reputation)
 
 
 @app.route('/question/<int:question_id>')
@@ -262,6 +263,8 @@ def delete_answer(answer_id=None):
 @app.route('/answer/<answer_id>/accept')
 def accept_answer(answer_id):
     data_manager.accept_answer(answer_id)
+    user_id = data_manager.get_user_id_by_answer_id(answer_id)
+    data_manager.increase_reputation('accept', user_id)
     question_id = data_manager.get_foreign_key_by_id(data_manager.answer_db, 'question_id', answer_id)
     return redirect('/question/{}'.format(question_id))
 
