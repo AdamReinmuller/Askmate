@@ -277,7 +277,5 @@ def get_qestions_by_tag(tag_name):
     return render_template('questions_by_tag.html', questions=questions, headers=headers, tag_name=tag_name)
 
 
-
-
 if __name__ == '__main__':
     app.run(debug=True, port=5000, host='0.0.0.0')
