@@ -291,7 +291,7 @@ def register():
         return render_template('registration.html')
     elif request.method == 'POST':
         username = request.form['username']
-        password = request.form['password']
+        password = util.hash_password(request.form['password'])
         try:
             data_manager.register_user(username, password)
             return redirect('/')
