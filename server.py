@@ -240,24 +240,30 @@ def post_answer(question_id, answer_id=""):
 @app.route('/add-question', methods=['GET', 'POST'])
 @app.route('/add-question/<int:question_id>', methods=['GET', 'POST'])
 def add_edit_question(question_id=None):
-    if question_id and request.method == 'GET':
-        question = data_manager.get_line_data_by_id(data_manager.question_db, question_id)[0]
+    try:
+        user_id = data_manager.get_userid_by_username(session['username'])
+    except KeyError:
+        return redirect('/')
+    if question_id and request.method == 'GET' and user_id == data_manager.get_foreign_key_by_id(data_manager.question_db, 'users_id', question_id)[0]['users_id']:  # edit question
+        question = data_manager.get_line_data_by_id(data_manager.question_db, question_id)[0]  # edit get
         return render_template('add_questions.html', question=question, question_id=question_id)
 
-    elif request.method == 'POST' and question_id:
-        title = request.form['question_title']
+    elif request.method == 'POST' and question_id and user_id == data_manager.get_foreign_key_by_id(data_manager.question_db, 'users_id', question_id)[0]['users_id']:
+        title = request.form['question_title']  # edit post
         message = request.form['question_message']
         data_manager.update_question(question_id, title, message)
         return redirect('/question/{}'.format(question_id))
 
-    elif request.method == 'GET':
+    elif request.method == 'GET' and question_id is None:  # add get
         return render_template('add_questions.html', question_id=question_id)
 
-    else:
+    elif request.method == 'POST' and question_id is None:  # add post
         user_id = data_manager.get_userid_by_username(session.get('username'))
         data_manager.add_question(request.form['question_title'], request.form['question'], user_id)
         question_id = data_manager.get_last_question_id()
-        return redirect('/question/{}'.format(question_id))
+    else:
+        flash('Invalid user')
+    return redirect('/question/{}'.format(question_id))
 
 
 @app.route('/question/<int:question_id>/add-tag', methods=['GET', 'POST'])
