@@ -162,14 +162,20 @@ def add_image(question_id):
 
 @app.route('/question/<int:question_id>/<int:answer_id>/add-image', methods=['GET', 'POST'])
 def add_image_a(question_id, answer_id):
-    if request.method == 'GET':
+    try:
+        user_id = data_manager.get_userid_by_username(session['username'])
+    except KeyError:
+        return redirect('/')
+    if request.method == 'GET' and user_id == data_manager.get_foreign_key_by_id(data_manager.answer_db, 'users_id', answer_id)[0]['users_id']:
         return render_template('add-image.html')
-    elif request.method == 'POST':
+    elif request.method == 'POST' and user_id == data_manager.get_foreign_key_by_id(data_manager.answer_db, 'users_id', answer_id)[0]['users_id']:
         url = request.form['URL']
         filename = 'static/image_for_answer' + str(answer_id) + '.png'
         util.save_image_to_file(url, filename)
         data_manager.update_image_data_by_id(data_manager.answer_db, answer_id, filename)
-        return redirect('/question/{}'.format(question_id))
+    else:
+        flash('Invalid user')
+    return redirect('/question/{}'.format(question_id))
 
 
 @app.route('/question/<int:question_id>/delete-image')
