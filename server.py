@@ -26,6 +26,18 @@ def route_list():
     return render_template('list.html', questions=questions, headers=headers, user_id=user_id)
 
 
+@app.route('/user-list')
+@app.route('/user-list/')
+def route_user_list():
+    user_id = data_manager.get_userid_by_username(session.get('username'))
+    users = data_manager.import_from_db(data_manager.users_db)
+    headers = data_manager.get_column_names_of_table(data_manager.users_db)
+    if request.args:
+        users = data_manager.sort_table(data_manager.users_db, request.args['order_by'],
+                                            request.args['order_direction'])
+    return render_template('user_list.html', users=users, headers=headers, user_id=user_id)
+
+
 @app.route('/question/<int:question_id>/new-comment', methods=['GET', 'POST'])
 @app.route('/answer/<int:answer_id>/new-comment', methods=['GET', 'POST'])
 def add_comment(question_id=None, answer_id=None, comment=None, comment_id=-1):
@@ -104,9 +116,9 @@ def route_user(user_id):
     headers_q = data_manager.get_column_names_of_table(data_manager.question_db)
     headers_c = data_manager.get_column_names_of_table(data_manager.comment_db)
     headers_a = data_manager.get_column_names_of_table(data_manager.answer_db)
-    return render_template('user.html', questions_of_user=questions_of_user, user_answers_questions=user_answers_questions,
+    return render_template('user_page.html', questions_of_user=questions_of_user, user_answers_questions=user_answers_questions,
                            question_comments=question_comments, answer_comments=answer_comments,
-                           headers_q=headers_q, headers_a=headers_a, headers_c=headers_c, reputation=user_reputation)
+                           headers_q=headers_q, headers_a=headers_a, headers_c=headers_c, reputation=user_reputation, user_id=user_id)
 
 
 @app.route('/question/<int:question_id>')

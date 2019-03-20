@@ -44,18 +44,18 @@ def sort_table(table, key="", sort=""):
     :sort: asc or desc
     :return: questions in a list of ordered dictionaries
     """
-    questions = import_from_db(table)
+    table_to_sort = import_from_db(table)
     if sort == 'desc':
         try:
-            questions = sorted(questions, key=lambda x: int(x[key]), reverse=True)
+            table_to_sort = sorted(table_to_sort, key=lambda x: int(x[key]), reverse=True)
         except:
-            questions = sorted(questions, key=lambda x: x[key], reverse=True)
+            table_to_sort = sorted(table_to_sort, key=lambda x: x[key], reverse=True)
     elif sort == 'asc':
         try:
-            questions = sorted(questions, key=lambda x: int(x[key]), reverse=False)
+            table_to_sort = sorted(table_to_sort, key=lambda x: int(x[key]), reverse=False)
         except:
-            questions = sorted(questions, key=lambda x: x[key], reverse=False)
-    return questions
+            table_to_sort = sorted(table_to_sort, key=lambda x: x[key], reverse=False)
+    return table_to_sort
 
 
 @connection.connection_handler

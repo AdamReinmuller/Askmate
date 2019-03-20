@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>User page</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='icons/Askmate.ico') }}">
+</head>
+<body>
+{% include 'alert.html' %}
+{% if session['username'] %}
+    <h1>Welcome to your user page, {{ session['username'] }}!</h1>
+    <h2>Your reputation: {{ reputation }}</h2>
+    <h2>Your user ID: {{ user_id }}</h2>
+    <h4><a href="/">Back to Main page</a></h4>
+    <h4><a href="/logout">Logout</a></h4>
+    <h4><a href="/user-list">List of all registered users</a></h4>
+    <h4><a href="/list">List of all questions</a></h4>
+    {% if questions_of_user != [] %}
+        <p>Your questions:</p>
+        <table style="width:90%" border="1">
+            <tr>
+                <th>{{ headers_q[4] }}</th>
+            </tr>
+            {% for a_ques in questions_of_user %}
+                <tr>
+                    <td>
+                        <a href="/question/{{ a_ques['id'] }}/view_counter">{{ a_ques['title'] }}</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+    {% if user_answers_questions != [] %}
+        <p>Your answers:</p>
+        <table style="width:90%" border="1">
+            <tr>
+                <th>answer {{ headers_a[4] }}</th>
+                <th>question {{ headers_q[4] }}</th>
+            </tr>
+            {% for a_answer in user_answers_questions %}
+                <tr>
+                    <td>
+                        {{ a_answer['message'] }}
+                    </td>
+                    <td>
+                        <a href="/question/{{ a_answer['question_id'] }}/view_counter">{{ a_answer['title'] }}</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+    {% if question_comments != [] or answer_comments != [] %}
+        <p>Your comments:</p>
+
+        <table style="width:90%" border="1">
+            {% if question_comments != [] %}
+                <tr>
+                    <td colspan="3" align="center">Question comments:</td>
+                </tr>
+                <tr>
+                    <th>comment {{ headers_c[3] }}</th>
+                    <th colspan="2">question {{ headers_q[4] }}</th>
+                </tr>
+                {% for a_comment in question_comments %}
+                    <tr>
+                        <td>
+                            {{ a_comment['message'] }}
+                        </td>
+                        <td colspan="2">
+                            <a href="/question/{{ a_comment['question_id'] }}/view_counter">{{ a_comment['title'] }}</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+            {% if answer_comments != [] %}
+                <tr>
+                    <td colspan="3" align="center">Answer comments:</td>
+                </tr>
+                <tr>
+                    <th>comment {{ headers_c[3] }}</th>
+                    <th>answer {{ headers_a[4] }}</th>
+                    <th>question {{ headers_q[4] }}</th>
+                </tr>
+                {% for aq_comment in answer_comments %}
+                    <tr>
+                        <td>
+                            {{ aq_comment['comment message'] }}
+                        </td>
+                        <td>
+                            {{ aq_comment['answer message'] }}
+                        </td>
+                        <td>
+                            <a href="/question/{{ aq_comment['question_id'] }}/view_counter">{{ aq_comment['title'] }}</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+        </table>
+    {% endif %}
+{% endif %}
+</body>
+</html>
