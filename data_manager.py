@@ -7,6 +7,7 @@ answer_db = 'answer'
 comment_db = 'comment'
 tag_db = 'tag'
 question_tag_db = 'question_tag'
+users_db = 'users'
 
 
 @connection.connection_handler
@@ -58,30 +59,30 @@ def sort_table(table, key="", sort=""):
 
 
 @connection.connection_handler
-def add_question(cursor, title, message):
+def add_question(cursor, title, message, users_id):
     """
     :return: writes to question_db
     """
     current_time = util.get_time()
     cursor.execute("""INSERT INTO question
-                      (submission_time, view_number, vote_number, title, message, image)
-                      VALUES ( %(submission_time)s, 0, 0, %(title)s, %(message)s, 'no image' )
+                      (submission_time, view_number, vote_number, title, message, image, users_id)
+                      VALUES ( %(submission_time)s, 0, 0, %(title)s, %(message)s, 'no image', %(users_id)s )
                     """,
-                   dict(submission_time=current_time, title=title, message=message)
+                   dict(submission_time=current_time, title=title, message=message, users_id=users_id)
                    )
 
 
 @connection.connection_handler
-def add_answer(cursor, question_id, message):
+def add_answer(cursor, question_id, message, users_id):
     """
     :return: writes to answer_db
     """
     current_time = util.get_time()
     cursor.execute("""INSERT INTO answer
-                      (submission_time, vote_number, question_id, message, image)
-                      VALUES ( %(submission_time)s, 0, %(question_id)s, %(message)s, 'no image' )
+                      (submission_time, vote_number, question_id, message, image, users_id)
+                      VALUES ( %(submission_time)s, 0, %(question_id)s, %(message)s, 'no image', %(users_id)s)
                     """,
-                   dict(submission_time=current_time, question_id=question_id, message=message)
+                   dict(submission_time=current_time, question_id=question_id, message=message, users_id=users_id)
                    )
 
 
@@ -235,10 +236,6 @@ def search_answers(cursor, search_phrase):
     return answers
 
 
-
-#zsuzsi
-
-
 @connection.connection_handler
 def get_foreign_key_by_id(cursor, table, foreign_key_name, id):
     cursor.execute(sql.SQL("""
@@ -283,12 +280,12 @@ def get_lines_data_by_foreign_id(cursor, table, foreign_id_name, id):
 
 
 @connection.connection_handler
-def add_comment_to_table(cursor, table, id_type, id, message, submission_time, edited_count):
+def add_comment_to_table(cursor, table, id_type, id, message, submission_time, edited_count, users_id):
     cursor.execute(sql.SQL("""
-                    INSERT INTO {table} ({id_type}, message, submission_time, edited_count)
-                    VALUES (%(id)s, %(message)s, %(submission_time)s, %(edited_count)s)
+                    INSERT INTO {table} ({id_type}, message, submission_time, edited_count, users_id)
+                    VALUES (%(id)s, %(message)s, %(submission_time)s, %(edited_count)s, %(users_id)s)
                    """).format(table=sql.Identifier(table), id_type=sql.Identifier(id_type)),
-                   {'id': id, 'message': message, 'submission_time': submission_time, 'edited_count': edited_count})
+                   {'id': id, 'message': message, 'submission_time': submission_time, 'edited_count': edited_count, 'users_id': users_id})
 
 
 @connection.connection_handler
@@ -403,6 +400,15 @@ def get_tags(cursor, id_=None):
 
 
 @connection.connection_handler
+def get_tags_and_question_count(cursor):
+    cursor.execute('''SELECT tag.id, tag.name, COUNT(question_id) FROM tag JOIN question_tag
+                        ON tag.id = question_tag.tag_id
+                        GROUP BY tag.id
+                        ORDER BY tag.id''')
+    data = cursor.fetchall()
+    return data
+
+@connection.connection_handler
 def get_questions_by_tag(cursor, tag_name):
     cursor.execute('''SELECT question.*
                       FROM tag JOIN question_tag ON tag.id = question_tag.tag_id
@@ -410,6 +416,40 @@ def get_questions_by_tag(cursor, tag_name):
                       WHERE tag.name = %(tag_name)s''', {'tag_name':tag_name})
     data = cursor.fetchall()
     return data
+
+
+@connection.connection_handler
+def register_user(cursor, username, plain_text_password):
+    password = util.hash_password(plain_text_password)
+    current_date = util.get_time()
+    cursor.execute(("""
+                    INSERT INTO users
+                    (username, password, reputation, registration_date)
+                    VALUES (%(username)s, %(password)s, 0, %(registration_date)s)
+                   """), dict(username=username, password=password, registration_date=current_date))
+
+
+@connection.connection_handler
+def get_userid_by_username(cursor, username):
+    cursor.execute("""
+                        SELECT id FROM users
+                        WHERE username = %(username)s
+                       """, {'username': username})
+    id = cursor.fetchone()['id']
+    return id
+
+
+@connection.connection_handler
+def get_hashpw_of_username(cursor, username):
+    cursor.execute("""
+                        SELECT password FROM users
+                        WHERE username = %(username)s
+                       """, {'username': username})
+    try:
+        hashpw = cursor.fetchone()['password']
+        return hashpw
+    except:
+        return False
 
 
 @connection.connection_handler

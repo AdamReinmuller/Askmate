@@ -1,15 +1,17 @@
-from flask import Flask, request, render_template, redirect
+from flask import Flask, request, render_template, redirect, session, escape
 import util
 import data_manager
 
 app = Flask(__name__)
+app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
 
 @app.route('/')
 def index():
+    user_id = 1  #data_manager.get_userid_by_username(session['username'])
     questions = data_manager.get_five_latest_submitted_titles_with_ids_from_table('question')
     header = data_manager.get_column_names_of_table(data_manager.question_db)[4]
-    return render_template('index.html', questions=questions, header=header)
+    return render_template('index.html', questions=questions, header=header, user_id=user_id)
 
 
 @app.route('/list')
@@ -38,14 +40,15 @@ def add_comment(question_id=None, answer_id=None, comment=None, comment_id=-1):
                                    comment_id=comment_id)
 
     elif request.method == 'POST':
+        user_id = data_manager.get_userid_by_username(session['username'])
         if request.path.startswith("/q"):
             data_manager.add_comment_to_table(data_manager.comment_db, 'question_id', question_id,
-                                              request.form['comment'], util.get_time(), 0)
+                                              request.form['comment'], util.get_time(), 0, user_id)
         else:
             question_id = data_manager.get_foreign_key_by_id(data_manager.answer_db, 'question_id', answer_id)[0][
                 'question_id']
             data_manager.add_comment_to_table(data_manager.comment_db, 'answer_id', answer_id, request.form['comment'],
-                                              util.get_time(), 0)
+                                              util.get_time(), 0, user_id)
         return redirect('/question/{}'.format(question_id))
 
 
@@ -78,6 +81,51 @@ def edit_comment(comment_id):
                 'question_id']
         data_manager.update_comment_message_submt_editedc_by_id(comment_id, request.form['comment'], util.get_time())
         return redirect('/question/{}'.format(question_id))
+
+
+
+
+
+@app.route('/user/<int:user_id>')
+def route_user(user_id):
+
+
+
+    question = data_manager.get_line_data_by_id(data_manager.question_db, question_id)
+    headers_q = data_manager.get_column_names_of_table(data_manager.question_db)
+    headers_c = data_manager.get_column_names_of_table(data_manager.comment_db)[3:5]
+    headers_a = data_manager.get_column_names_of_table(data_manager.answer_db)
+    comments_q = data_manager.get_comments_data_by_foreign_id('question_id', question_id)
+    answers = data_manager.get_lines_data_by_foreign_id(data_manager.answer_db, 'question_id', question_id)
+    filename_q = '/static/image_for_question' + str(question_id) + '.png'
+    image_q = util.check_file(filename_q.lstrip("/"))
+    tags = data_manager.get_tags(question_id)
+    answer_ids = {}
+    for answer in answers:
+        answer_ids[answer['id']] = [util.check_file('static/image_for_answer' + str(answer['id']) + '.png'),
+                                    '/static/image_for_answer' + str(answer['id']) + '.png',
+                                    data_manager.get_lines_data_by_foreign_id(data_manager.comment_db, 'answer_id',
+                                                                              answer['id'])]
+    return render_template('question.html', question_id=question_id, question=question, headers_q=headers_q,
+                           comments_q=comments_q, headers_c=headers_c, answers=answers,
+                           headers_a=headers_a, image_q=image_q, filename_q=filename_q, answer_ids=answer_ids,
+                           tags=tags)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @app.route('/question/<int:question_id>')
@@ -164,8 +212,9 @@ def post_answer(question_id, answer_id=""):
         return redirect('/question/{}'.format(question_id))
     else:
         if request.method == 'POST':
+            user_id = data_manager.get_userid_by_username(session['username'])
             form_answer = request.form['answer_message']
-            data_manager.add_answer(question_id, form_answer)
+            data_manager.add_answer(question_id, form_answer, user_id)
             return redirect('/question/{}'.format(question_id))
         else:
             single_question = data_manager.get_line_data_by_id(data_manager.question_db, question_id)
@@ -190,7 +239,8 @@ def add_edit_question(question_id=None):
         return render_template('add_questions.html', question_id=question_id)
 
     else:
-        data_manager.add_question(request.form['question_title'], request.form['question'])
+        user_id = data_manager.get_userid_by_username(session['username'])
+        data_manager.add_question(request.form['question_title'], request.form['question'], user_id)
         question_id = data_manager.get_last_question_id()
         return redirect('/question/{}'.format(question_id))
 
@@ -264,6 +314,41 @@ def search():
     answers = data_manager.search_answers(search_phrase)
     return render_template('search_results.html', questions=questions, answers=answers,
                            headers=headers, search_phrase=search_phrase)
+
+
+@app.route('/registration', methods=['GET', 'POST'])
+def register():
+    if request.method == 'GET':
+        return render_template('registration.html')
+    elif request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        try:
+            data_manager.register_user(username, password)
+            return redirect('/')
+        except:
+            invalid_username = 'Username is taken'
+            return render_template('registration.html', invalid_username=invalid_username)
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        good_hash_pw = data_manager.get_hashpw_of_username(request.form['username'])
+        if good_hash_pw and util.verify_password(request.form['password'], good_hash_pw):
+            session['username'] = request.form['username']
+            return redirect('/')
+        else:
+            invalid_username_or_password = 'invalid username or password'
+            return render_template('login', invalid_username_or_password=invalid_username_or_password)
+    elif request.method == 'GET':
+        return render_template('login')
+
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    return redirect('/')
 
 
 @app.route('/tags')
