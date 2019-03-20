@@ -1,6 +1,10 @@
 <div class="answer_buttons">
     <table align="center" cellpadding="40">
         <tr>
+         <td>
+                <a href="/answer/{{ answer['id'] }}/accept" onclick="return confirm('Are you sure?')">Accept
+                    answer</a>
+            </td>
             <td>
                 <a href="/answer/{{ answer['id'] }}/delete" onclick="return confirm('Are you sure?')">Delete
                     answer</a>
