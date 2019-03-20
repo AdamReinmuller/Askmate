@@ -44,7 +44,7 @@ def add_comment(question_id=None, answer_id=None, comment=None, comment_id=-1):
                                    comment_id=comment_id)
 
     elif request.method == 'POST':
-        user_id = data_manager.get_userid_by_username(session['username'])
+        user_id = data_manager.get_userid_by_username(session.get('username'))
         if request.path.startswith("/q"):
             data_manager.add_comment_to_table(data_manager.comment_db, 'question_id', question_id,
                                               request.form['comment'], util.get_time(), 0, user_id)
@@ -191,7 +191,7 @@ def post_answer(question_id, answer_id=""):
         return redirect('/question/{}'.format(question_id))
     else:
         if request.method == 'POST':
-            user_id = data_manager.get_userid_by_username(session['username'])
+            user_id = data_manager.get_userid_by_username(session.get('username'))
             form_answer = request.form['answer_message']
             data_manager.add_answer(question_id, form_answer, user_id)
             return redirect('/question/{}'.format(question_id))
@@ -218,7 +218,7 @@ def add_edit_question(question_id=None):
         return render_template('add_questions.html', question_id=question_id)
 
     else:
-        user_id = data_manager.get_userid_by_username(session['username'])
+        user_id = data_manager.get_userid_by_username(session.get('username'))
         data_manager.add_question(request.form['question_title'], request.form['question'], user_id)
         question_id = data_manager.get_last_question_id()
         return redirect('/question/{}'.format(question_id))
@@ -256,6 +256,13 @@ def delete_answer(answer_id=None):
     filename = 'static/image_for_answer' + str(answer_id) + '.png'
     if util.check_file(filename):
         util.delete_file(filename)
+    return redirect('/question/{}'.format(question_id))
+
+
+@app.route('/answer/<answer_id>/accept')
+def accept_answer(answer_id):
+    data_manager.accept_answer(answer_id)
+    question_id = data_manager.get_foreign_key_by_id(data_manager.answer_db, 'question_id', answer_id)
     return redirect('/question/{}'.format(question_id))
 
 
