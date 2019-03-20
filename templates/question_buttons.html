@@ -13,20 +13,22 @@
                     <td>
                         <a href="/question/{{ question_id }}/new-comment">Add comment</a><br>
                     </td>
-                    <td>
-                        <a href="/question/{{ question_id }}/{{ question_id }}/question/up">
-                            <img src='{{ url_for('static', filename='icons/voteup.png') }}'
-                                 alt="here should be vote up image"
-                                 width="40" height="40" onclick="this.style.display='none'">
-                        </a><br>
-                    </td>
-                    <td>
-                        <a href="/question/{{ question_id }}/{{ question_id }}/question/down">
-                            <img src='{{ url_for('static', filename='icons/votedown.png') }}'
-                                 alt="here should be vote down image"
-                                 width="40" height="40" onclick="this.style.display='none'">
-                        </a><br>
-                    </td>
+                    {% if question_id not in voted_questions_of_user %}
+                        <td>
+                            <a href="/question/{{ question_id }}/{{ question_id }}/question/up">
+                                <img src='{{ url_for('static', filename='icons/voteup.png') }}'
+                                     alt="here should be vote up image"
+                                     width="40" height="40">
+                            </a><br>
+                        </td>
+                        <td>
+                            <a href="/question/{{ question_id }}/{{ question_id }}/question/down">
+                                <img src='{{ url_for('static', filename='icons/votedown.png') }}'
+                                     alt="here should be vote down image"
+                                     width="40" height="40">
+                            </a><br>
+                        </td>
+                    {% endif %}
                 {% endif %}
                 {% if user_id == question[0]['users_id'] %}
                     <td>

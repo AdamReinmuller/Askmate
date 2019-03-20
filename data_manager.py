@@ -8,6 +8,7 @@ comment_db = 'comment'
 tag_db = 'tag'
 question_tag_db = 'question_tag'
 users_db = 'users'
+user_vote_db = 'user_vote'
 
 
 @connection.connection_handler
@@ -333,6 +334,14 @@ def add_comment_to_table(cursor, table, id_type, id, message, submission_time, e
 
 
 @connection.connection_handler
+def add_vote_to_user_vote(cursor, question_id, answer_id, users_id,):
+    cursor.execute("""
+                    INSERT INTO user_vote (question_id, answer_id, id)
+                    VALUES (%(question_id)s, %(answer_id)s, %(users_id)s)
+                   """,
+                   {'question_id': question_id, 'answer_id': answer_id, 'users_id': users_id})
+
+@connection.connection_handler
 def delete_line_by_id(cursor, table, id):
     cursor.execute(sql.SQL("""
                             DELETE FROM {table}
@@ -530,9 +539,6 @@ def get_user_id_by_answer_id(cursor, answer_id=1):
     WHERE id = %(answer_id)s''', {'answer_id':answer_id})
     user_id = cursor.fetchone()['users_id']
     return user_id
-
-if __name__ == '__main__':
-    print(get_user_id_by_answer_id())
 
 
 @connection.connection_handler

@@ -82,6 +82,12 @@ CREATE TABLE users (
     registration_date timestamp without time zone
 );
 
+DROP TABLE IF EXISTS public.user_vote;
+CREATE TABLE user_vote (
+    question_id integer,
+    answer_id integer,
+    id integer NOT NULL
+);
 
 ALTER TABLE ONLY users
     ADD CONSTRAINT pk_users_id PRIMARY KEY (id);
@@ -124,6 +130,15 @@ ALTER TABLE ONLY comment
 
 ALTER TABLE ONLY question_tag
     ADD CONSTRAINT fk_tag_id FOREIGN KEY (tag_id) REFERENCES tag(id);
+
+ALTER TABLE ONLY user_vote
+    ADD CONSTRAINT fk_voted_question_id FOREIGN KEY (question_id) REFERENCES question(id);
+
+ALTER TABLE ONLY user_vote
+    ADD CONSTRAINT fk_voted_answer_id FOREIGN KEY (answer_id) REFERENCES answer(id);
+
+ALTER TABLE ONLY user_vote
+    ADD CONSTRAINT fk_user_id FOREIGN KEY (id) REFERENCES users(id);
 
 INSERT INTO users VALUES (1, 'test', 'test hash', 0, '2019-01-01 05:49:00');
 SELECT pg_catalog.setval('users_id_seq', 1, true);

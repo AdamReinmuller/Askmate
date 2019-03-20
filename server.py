@@ -139,10 +139,19 @@ def route_question(question_id):
                                     '/static/image_for_answer' + str(answer['id']) + '.png',
                                     data_manager.get_lines_data_by_foreign_id(data_manager.comment_db, 'answer_id',
                                                                               answer['id'])]
+    voted_questions_of_user_in_list = data_manager.get_foreign_key_by_id(data_manager.user_vote_db, 'question_id', user_id)
+    voted_answers_of_user_in_list = data_manager.get_foreign_key_by_id(data_manager.user_vote_db, 'answer_id', user_id)
+    voted_questions_of_user = []
+    voted_answers_of_user = []
+    for item in voted_questions_of_user_in_list:
+        voted_questions_of_user.append(item['question_id'])
+    for item in voted_answers_of_user_in_list:
+        voted_answers_of_user.append(item['answer_id'])
     return render_template('question.html', question_id=question_id, question=question, headers_q=headers_q,
                            comments_q=comments_q, headers_c=headers_c, answers=answers,
                            headers_a=headers_a, image_q=image_q, filename_q=filename_q, answer_ids=answer_ids,
-                           tags=tags, user_id=user_id)
+                           tags=tags, user_id=user_id, voted_questions_of_user=voted_questions_of_user,
+                           voted_answers_of_user=voted_answers_of_user)
 
 
 @app.route('/question/<int:question_id>/view_counter')
@@ -302,8 +311,10 @@ def delete_question(question_id=None):
 
 @app.route('/question/<int:question_id>/<int:id>/<file_>/<method>')
 def vote(question_id=None, id=None, file_=None, method=None):
+    users_id = data_manager.get_userid_by_username(session['username'])
     if file_ == 'answer':
         data_manager.change_vote_number_in_table(data_manager.answer_db, id, method)
+        data_manager.add_vote_to_user_vote(None, id, users_id)
         user_id = data_manager.get_user_id_by_answer_id(id)
         if method == 'up':
             data_manager.increase_reputation('answer', user_id=user_id)
@@ -311,6 +322,7 @@ def vote(question_id=None, id=None, file_=None, method=None):
             data_manager.reduce_reputation(user_id=user_id)
     else:
         data_manager.change_vote_number_in_table(data_manager.question_db, id, method)
+        data_manager.add_vote_to_user_vote(id, None, users_id)
         user_id = data_manager.get_user_id_by_question_id(id)
         if method == 'up':
             data_manager.increase_reputation('question', user_id=user_id)
