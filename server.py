@@ -110,6 +110,7 @@ def route_user(user_id):
 
 @app.route('/question/<int:question_id>')
 def route_question(question_id):
+    user_id = data_manager.get_userid_by_username(session.get('username'))
     question = data_manager.get_line_data_by_id(data_manager.question_db, question_id)
     headers_q = data_manager.get_column_names_of_table(data_manager.question_db)
     headers_c = data_manager.get_column_names_of_table(data_manager.comment_db)[3:5]
@@ -128,7 +129,7 @@ def route_question(question_id):
     return render_template('question.html', question_id=question_id, question=question, headers_q=headers_q,
                            comments_q=comments_q, headers_c=headers_c, answers=answers,
                            headers_a=headers_a, image_q=image_q, filename_q=filename_q, answer_ids=answer_ids,
-                           tags=tags)
+                           tags=tags, user_id=user_id)
 
 
 @app.route('/question/<int:question_id>/view_counter')

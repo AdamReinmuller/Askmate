@@ -11,7 +11,7 @@
 <h1>Details of Question</h1>
 <h4><a href="/">Back to Main page</a></h4>
  {% if session['username'] %}
-<h4><a href="/user/<user_id>">Back to user page</a></h4>
+<h4><a href="/user/{{ user_id }}">Back to user page</a></h4>
 {% endif %}
 <br>
 {% include 'tags.html' %}
@@ -49,6 +49,7 @@
     <h3>Answers to the Question:</h3>
     {% for answer in answers %}
         {% include 'answers_to_question.html' %}
+        <p></p>
         {% include 'answer_buttons.html' %}
     {% endfor %}
 {% endif %}
