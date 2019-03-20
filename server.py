@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, session, escape
+from flask import Flask, request, render_template, redirect, session, flash
 import util
 import data_manager
 
@@ -28,6 +28,10 @@ def route_list():
 @app.route('/question/<int:question_id>/new-comment', methods=['GET', 'POST'])
 @app.route('/answer/<int:answer_id>/new-comment', methods=['GET', 'POST'])
 def add_comment(question_id=None, answer_id=None, comment=None, comment_id=-1):
+    try:
+        user_id = data_manager.get_userid_by_username(session['username'])
+    except KeyError:
+        return redirect('/')
     if request.method == 'GET':
         if request.path.startswith("/q"):
             question_title = data_manager.get_line_data_by_id(data_manager.question_db, question_id)[0]['title']
@@ -54,6 +58,10 @@ def add_comment(question_id=None, answer_id=None, comment=None, comment_id=-1):
 
 @app.route('/comments/<int:comment_id>/delete')
 def delete_comment(comment_id):
+    try:
+        user_id = data_manager.get_userid_by_username(session['username'])
+    except KeyError:
+        return redirect('/')
     answer_id = data_manager.get_foreign_key_by_id(data_manager.comment_db, 'answer_id', comment_id)[0]['answer_id']
     if answer_id:
         question_id = data_manager.get_foreign_key_by_id(data_manager.answer_db, 'question_id', answer_id)[0][
@@ -61,9 +69,11 @@ def delete_comment(comment_id):
     else:
         question_id = data_manager.get_foreign_key_by_id(data_manager.comment_db, 'question_id', comment_id)[0][
             'question_id']
-    data_manager.delete_line_by_id(data_manager.comment_db, comment_id)
+    if user_id == data_manager.get_foreign_key_by_id(data_manager.comment_db, 'users_id', comment_id):
+        data_manager.delete_line_by_id(data_manager.comment_db, comment_id)
+    else:
+        flash('Invalid user')
     return redirect('/question/{}'.format(question_id))
-
 
 @app.route('/comments/<int:comment_id>/edit', methods=['GET', 'POST'])
 def edit_comment(comment_id):
@@ -315,10 +325,11 @@ def login():
             session['username'] = request.form['username']
             return redirect('/')
         else:
+            flash('Invalid username or password')
             invalid_username_or_password = 'invalid username or password'
-            return render_template('login', invalid_username_or_password=invalid_username_or_password)
+            return render_template('login.html', invalid_username_or_password=invalid_username_or_password)
     elif request.method == 'GET':
-        return render_template('login')
+        return render_template('login.html')
 
 
 @app.route('/logout')

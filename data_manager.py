@@ -485,7 +485,6 @@ def get_userid_by_username(cursor, username):
     except:
         return False
 
-
 @connection.connection_handler
 def get_hashpw_of_username(cursor, username):
     cursor.execute("""
