@@ -11,6 +11,8 @@
 <h1>Welcome to your user page, {{ session['username'] }}!</h1>
 <h2>Your reputation: {{ reputation }}</h2>
 <h4><a href="/">Back to Main page</a></h4>
+<h4><a href="/logout">Logout</a></h4>
+<h4><a href="/list">List of all questions</a></h4>
 {% if questions_of_user != [] %}
     <p>Your questions:</p>
     <table style="width:90%" border="1">

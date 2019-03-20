@@ -6,8 +6,10 @@
             {% for header in headers_c %}
                 <th>{{ header }}</th>
             {% endfor %}
+        {% if session['username'] %}
             <th>Delete comment</th>
             <th>Edit comment</th>
+            {% endif %}
         </tr>
         {% for comment in answer_ids[answer['id']][2] %}
             <tr>
@@ -17,6 +19,7 @@
                     {% endif %}
                 </td>
                 <td>{{ comment['submission_time'] }}</td>
+            {% if session['username'] %}
                 <td>
                     <a href="/comments/{{ comment['id'] }}/delete" onclick="return confirm('Are you sure?')">
                         <img src='{{ url_for('static', filename='icons/recycle_bin.png') }}'
@@ -27,6 +30,7 @@
                 <td>
                     <a href="/comments/{{ comment['id'] }}/edit">Edit comment</a>
                 </td>
+            {% endif %}
             </tr>
         {% endfor %}
     </table>

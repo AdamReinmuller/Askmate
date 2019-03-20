@@ -13,6 +13,7 @@
             <td>
                 <a href="/question/{{ question_id }}/{{ answer['id'] }}">Edit answer</a>
             </td>
+         {% if user_id != answer['users_id'] %}
             <td>
                 <a href="/question/{{ question_id }}/{{ answer['id'] }}/answer/up">
                     <img src='{{ url_for('static', filename='icons/voteup.png') }}' alt="here should be vote up image"
@@ -26,6 +27,7 @@
                          width="40" height="40">
                 </a><br>
             </td>
+             {% endif %}
             <td>
                 <a href="/answer/{{ answer['id'] }}/new-comment">Add comment</a><br>
             </td>

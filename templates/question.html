@@ -11,7 +11,12 @@
 <h1>Details of Question</h1>
 <h4><a href="/">Back to Main page</a></h4>
  {% if session['username'] %}
-<h4><a href="/user/{{ user_id }}">Back to user page</a></h4>
+    <h4><a href="/logout">Logout</a></h4>
+    <h4><a href="/user/{{ user_id }}">Your activities - {{ session['username'] }}'s user page</a></h4>
+    <h4><a href="/add-question">Add new question</a></h4>
+{% else %}
+    <h4><a href="/registration">Register</a></h4>
+    <h4><a href="/login">Login</a></h4>
 {% endif %}
 <br>
 {% include 'tags.html' %}

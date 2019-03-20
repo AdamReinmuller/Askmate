@@ -17,12 +17,13 @@ def index():
 @app.route('/list')
 @app.route('/list/')
 def route_list():
+    user_id = data_manager.get_userid_by_username(session.get('username'))
     questions = data_manager.import_from_db(data_manager.question_db)
     headers = data_manager.get_column_names_of_table(data_manager.question_db)
     if request.args:
         questions = data_manager.sort_table(data_manager.question_db, request.args['order_by'],
                                             request.args['order_direction'])
-    return render_template('list.html', questions=questions, headers=headers)
+    return render_template('list.html', questions=questions, headers=headers, user_id=user_id)
 
 
 @app.route('/question/<int:question_id>/new-comment', methods=['GET', 'POST'])
@@ -308,12 +309,13 @@ def vote(question_id=None, id=None, file_=None, method=None):
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
+    user_id = data_manager.get_userid_by_username(session.get('username'))
     search_phrase = request.form['search_phrase']
     headers = data_manager.get_column_names_of_table(data_manager.question_db)
     questions = data_manager.search(search_phrase)
     answers = data_manager.search_answers(search_phrase)
     return render_template('search_results.html', questions=questions, answers=answers,
-                           headers=headers, search_phrase=search_phrase)
+                           headers=headers, search_phrase=search_phrase, user_id=user_id)
 
 
 @app.route('/registration', methods=['GET', 'POST'])
