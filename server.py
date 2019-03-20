@@ -93,49 +93,18 @@ def edit_comment(comment_id):
         return redirect('/question/{}'.format(question_id))
 
 
-
-
-
 @app.route('/user/<int:user_id>')
 def route_user(user_id):
-
-
-
-    question = data_manager.get_line_data_by_id(data_manager.question_db, question_id)
+    questions_of_user = data_manager.get_lines_data_by_foreign_id(data_manager.question_db, 'users_id', user_id)
+    user_answers_questions = data_manager.get_answers_with_their_questions_by_foreign_id('users_id', user_id)
+    question_comments = data_manager.get_question_comments_message_with_question_by_foreign_id('users_id', user_id)
+    answer_comments = data_manager.get_answer_comments_message_with_answer_and_question_by_foreign_id('users_id', user_id)
     headers_q = data_manager.get_column_names_of_table(data_manager.question_db)
-    headers_c = data_manager.get_column_names_of_table(data_manager.comment_db)[3:5]
+    headers_c = data_manager.get_column_names_of_table(data_manager.comment_db)
     headers_a = data_manager.get_column_names_of_table(data_manager.answer_db)
-    comments_q = data_manager.get_comments_data_by_foreign_id('question_id', question_id)
-    answers = data_manager.get_lines_data_by_foreign_id(data_manager.answer_db, 'question_id', question_id)
-    filename_q = '/static/image_for_question' + str(question_id) + '.png'
-    image_q = util.check_file(filename_q.lstrip("/"))
-    tags = data_manager.get_tags(question_id)
-    answer_ids = {}
-    for answer in answers:
-        answer_ids[answer['id']] = [util.check_file('static/image_for_answer' + str(answer['id']) + '.png'),
-                                    '/static/image_for_answer' + str(answer['id']) + '.png',
-                                    data_manager.get_lines_data_by_foreign_id(data_manager.comment_db, 'answer_id',
-                                                                              answer['id'])]
-    return render_template('question.html', question_id=question_id, question=question, headers_q=headers_q,
-                           comments_q=comments_q, headers_c=headers_c, answers=answers,
-                           headers_a=headers_a, image_q=image_q, filename_q=filename_q, answer_ids=answer_ids,
-                           tags=tags)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    return render_template('user.html', questions_of_user=questions_of_user, user_answers_questions=user_answers_questions,
+                           question_comments=question_comments, answer_comments=answer_comments,
+                           headers_q=headers_q, headers_a=headers_a, headers_c=headers_c, )
 
 
 @app.route('/question/<int:question_id>')
@@ -332,7 +301,7 @@ def register():
         return render_template('registration.html')
     elif request.method == 'POST':
         username = request.form['username']
-        password = request.form['password']
+        password = util.hash_password(request.form['password'])
         try:
             data_manager.register_user(username, password)
             return redirect('/')
@@ -360,6 +329,21 @@ def login():
 def logout():
     session.pop('username', None)
     return redirect('/')
+
+
+@app.route('/tags')
+def tag_page():
+    data = data_manager.get_tags_and_question_count()
+    return render_template('all_tags.html', data=data)
+
+
+@app.route('/tags/<string:tag_name>')
+def get_qestions_by_tag(tag_name):
+    headers = data_manager.get_column_names_of_table(data_manager.question_db)
+    questions = data_manager.get_questions_by_tag(tag_name)
+    return render_template('questions_by_tag.html', questions=questions, headers=headers, tag_name=tag_name)
+
+
 
 
 if __name__ == '__main__':

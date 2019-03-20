@@ -260,12 +260,35 @@ def get_line_data_by_id(cursor, table, id):
 @connection.connection_handler
 def get_comments_data_by_foreign_id(cursor, foreign_id_name, id):
     cursor.execute(sql.SQL("""
-                    SELECT id, message, submission_time, edited_count FROM comment
+                    SELECT id, message, submission_time, edited_count, users_id FROM comment
                     WHERE {foreign_id_name} = %(id)s
                     ORDER BY submission_time DESC;
                    """).format(foreign_id_name=sql.Identifier(foreign_id_name)), {'id': id})
     comments_data = cursor.fetchall()
     return comments_data
+
+
+@connection.connection_handler
+def get_question_comments_message_with_question_by_foreign_id(cursor, foreign_id_name, id):
+    cursor.execute(sql.SQL("""
+                    SELECT comment.message, comment.question_id, title FROM comment join question on question_id=question.id
+                    WHERE question_id is not null And comment.{foreign_id_name} = %(id)s 
+                    ORDER BY comment.message ASC;
+                   """).format(foreign_id_name=sql.Identifier(foreign_id_name)), {'id': id})
+    comments_data = cursor.fetchall()
+    return comments_data
+
+@connection.connection_handler
+def get_answer_comments_message_with_answer_and_question_by_foreign_id(cursor, foreign_id_name, id):
+    cursor.execute(sql.SQL("""
+                    SELECT comment.message AS "comment message", comment.answer_id, answer.message AS "answer message", answer.question_id, title 
+                    FROM (comment join answer on answer_id=answer.id) join question on answer.question_id=question.id
+                    WHERE answer_id is not null And comment.{foreign_id_name} = %(id)s 
+                    ORDER BY comment.message ASC;
+                   """).format(foreign_id_name=sql.Identifier(foreign_id_name)), {'id': id})
+    comments_data = cursor.fetchall()
+    return comments_data
+
 
 
 @connection.connection_handler
@@ -277,6 +300,18 @@ def get_lines_data_by_foreign_id(cursor, table, foreign_id_name, id):
                    """).format(table=sql.Identifier(table), foreign_id_name=sql.Identifier(foreign_id_name)), {'id': id})
     lines_data = cursor.fetchall()
     return lines_data
+
+
+@connection.connection_handler
+def get_answers_with_their_questions_by_foreign_id(cursor, foreign_id_name, id):
+    cursor.execute(sql.SQL("""
+                    SELECT answer.message, question.id AS question_id, question.title FROM answer join question on question_id=question.id
+                    WHERE answer.{foreign_id_name} = %(id)s
+                    ORDER BY answer.message ASC;
+                   """).format(foreign_id_name=sql.Identifier(foreign_id_name)), {'id': id})
+    lines_data = cursor.fetchall()
+    return lines_data
+
 
 
 @connection.connection_handler
@@ -400,11 +435,22 @@ def get_tags(cursor, id_=None):
 
 
 @connection.connection_handler
-def get_questions_by_tag(cursor, tag_id):
-    cursor.execute('''SELECT question_id FROM question_tag
-                      WHERE tag_id=%(tag_id)s''', {'tag_id': tag_id})
-    question_ids = [id['question_id'] for id in cursor.fetchall()]
-    return question_ids
+def get_tags_and_question_count(cursor):
+    cursor.execute('''SELECT tag.id, tag.name, COUNT(question_id) FROM tag JOIN question_tag
+                        ON tag.id = question_tag.tag_id
+                        GROUP BY tag.id
+                        ORDER BY tag.id''')
+    data = cursor.fetchall()
+    return data
+
+@connection.connection_handler
+def get_questions_by_tag(cursor, tag_name):
+    cursor.execute('''SELECT question.*
+                      FROM tag JOIN question_tag ON tag.id = question_tag.tag_id
+                      JOIN question ON question_tag.question_id = question.id
+                      WHERE tag.name = %(tag_name)s''', {'tag_name':tag_name})
+    data = cursor.fetchall()
+    return data
 
 
 @connection.connection_handler

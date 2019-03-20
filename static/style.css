@@ -25,3 +25,34 @@
 /*    padding: 0;*/
 /*    list-style: none;*/
 /*}*/
+
+.tag{
+    background-color: #3897ae;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    border-radius: 6px;
+    padding: 2px;
+    width: max-content;
+}
+
+.tag a[name=link]{
+    color: white;
+    text-decoration: none;
+    font-family: 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva', 'Verdana', sans-serif;
+}
+
+.tag a[name=link]:hover{
+    color: #a2a2a2;
+    text-decoration: none;
+    font-family: 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva', 'Verdana', sans-serif;
+}
+.tag a[name=del]{
+    color: #5a5a5a;
+    text-decoration: none;
+    font-family: 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva', 'Verdana', sans-serif;
+}
+
+ul[name=tag_list]{
+    list-style-type: none;
+}
+
