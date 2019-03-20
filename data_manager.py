@@ -533,3 +533,11 @@ def get_user_id_by_answer_id(cursor, answer_id=1):
 
 if __name__ == '__main__':
     print(get_user_id_by_answer_id())
+
+
+@connection.connection_handler
+def get_reputation_by_id(cursor, user_id):
+    cursor.execute('''SELECT reputation FROM users
+    WHERE id = %(user_id)s''', {'user_id':user_id})
+    reputation = cursor.fetchone()['reputation']
+    return reputation
