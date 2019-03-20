@@ -211,6 +211,10 @@ def delete_answer_image(question_id, answer_id):
 @app.route('/question/<int:question_id>/<int:answer_id>', methods=['GET', 'POST'])
 @app.route('/question/<int:question_id>/new-answer', methods=['GET', 'POST'])
 def post_answer(question_id, answer_id=""):
+    try:
+        user_id = data_manager.get_userid_by_username(session['username'])
+    except KeyError:
+        return redirect('/')
     if request.path == '/question/' + str(question_id) + '/' + str(answer_id) and request.method == 'GET':
         single_question = data_manager.get_line_data_by_id(data_manager.question_db, question_id)
         question_title = single_question[0]['title']
