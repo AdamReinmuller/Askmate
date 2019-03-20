@@ -374,9 +374,6 @@ def get_questions_by_tag(cursor, tag_name):
     data = cursor.fetchall()
     return data
 
-if __name__ == '__main__':
-    print(get_tags_and_question_count())
-
 
 @connection.connection_handler
 def get_last_question_id(cursor):
@@ -473,5 +470,20 @@ def reduce_reputation(cursor, user_id):
                       WHERE id = %(user_id)s''', {'user_id': user_id})
 
 
+@connection.connection_handler
+def get_user_id_by_question_id(cursor, question_id=1):
+    cursor.execute('''SELECT users_id FROM question
+    WHERE id = %(question_id)s''', {'question_id':question_id})
+    user_id = cursor.fetchone()['users_id']
+    return user_id
 
 
+@connection.connection_handler
+def get_user_id_by_answer_id(cursor, answer_id=1):
+    cursor.execute('''SELECT users_id FROM answer
+    WHERE id = %(answer_id)s''', {'answer_id':answer_id})
+    user_id = cursor.fetchone()['users_id']
+    return user_id
+
+if __name__ == '__main__':
+    print(get_user_id_by_answer_id())

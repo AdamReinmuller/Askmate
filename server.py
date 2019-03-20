@@ -301,8 +301,18 @@ def delete_question(question_id=None):
 def vote(question_id=None, id=None, file_=None, method=None):
     if file_ == 'answer':
         data_manager.change_vote_number_in_table(data_manager.answer_db, id, method)
+        user_id = data_manager.get_user_id_by_answer_id(id)
+        if method == 'up':
+            data_manager.increase_reputation('answer', user_id=user_id)
+        elif method == 'down':
+            data_manager.reduce_reputation(user_id=user_id)
     else:
         data_manager.change_vote_number_in_table(data_manager.question_db, id, method)
+        user_id = data_manager.get_user_id_by_question_id(id)
+        if method == 'up':
+            data_manager.increase_reputation('question', user_id=user_id)
+        elif method == 'down':
+            data_manager.reduce_reputation(user_id=user_id)
     return redirect('/question/{}'.format(question_id))
 
 
