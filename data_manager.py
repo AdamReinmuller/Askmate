@@ -400,11 +400,22 @@ def get_tags(cursor, id_=None):
 
 
 @connection.connection_handler
-def get_questions_by_tag(cursor, tag_id):
-    cursor.execute('''SELECT question_id FROM question_tag
-                      WHERE tag_id=%(tag_id)s''', {'tag_id': tag_id})
-    question_ids = [id['question_id'] for id in cursor.fetchall()]
-    return question_ids
+def get_tags_and_question_count(cursor):
+    cursor.execute('''SELECT tag.id, tag.name, COUNT(question_id) FROM tag JOIN question_tag
+                        ON tag.id = question_tag.tag_id
+                        GROUP BY tag.id
+                        ORDER BY tag.id''')
+    data = cursor.fetchall()
+    return data
+
+@connection.connection_handler
+def get_questions_by_tag(cursor, tag_name):
+    cursor.execute('''SELECT question.*
+                      FROM tag JOIN question_tag ON tag.id = question_tag.tag_id
+                      JOIN question ON question_tag.question_id = question.id
+                      WHERE tag.name = %(tag_name)s''', {'tag_name':tag_name})
+    data = cursor.fetchall()
+    return data
 
 
 @connection.connection_handler
