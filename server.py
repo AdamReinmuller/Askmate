@@ -69,7 +69,7 @@ def delete_comment(comment_id):
     else:
         question_id = data_manager.get_foreign_key_by_id(data_manager.comment_db, 'question_id', comment_id)[0][
             'question_id']
-    if user_id == data_manager.get_foreign_key_by_id(data_manager.comment_db, 'users_id', comment_id):
+    if user_id == data_manager.get_foreign_key_by_id(data_manager.comment_db, 'users_id', comment_id)[0]['users_id']:
         data_manager.delete_line_by_id(data_manager.comment_db, comment_id)
     else:
         flash('Invalid user')
@@ -301,7 +301,7 @@ def register():
         return render_template('registration.html')
     elif request.method == 'POST':
         username = request.form['username']
-        password = util.hash_password(request.form['password'])
+        password = request.form['password']
         try:
             data_manager.register_user(username, password)
             return redirect('/')
@@ -318,7 +318,6 @@ def login():
             session['username'] = request.form['username']
             return redirect('/')
         else:
-            flash('Invalid username or password')
             invalid_username_or_password = 'invalid username or password'
             return render_template('login.html', invalid_username_or_password=invalid_username_or_password)
     elif request.method == 'GET':
