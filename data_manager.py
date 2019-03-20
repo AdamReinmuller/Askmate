@@ -413,7 +413,25 @@ def get_questions_by_tag(cursor, tag_name):
 
 
 @connection.connection_handler
-def update_reputation(cursor, quantity, user_id):
-    cursor.execute('''UPDATE users
-                      SET reputation = reputation + %(quantity)s
-                      WHERE id = %(user_id)s''', {'quantity':quantity, 'user_id':user_id})
+def increase_reputation(cursor, mode, user_id):
+    if mode == 'answer':
+        cursor.execute('''UPDATE users SET reputation = reputation + 10
+                          WHERE id = %(user_id)s''', {'user_id':user_id})
+
+    elif mode == 'question':
+        cursor.execute('''UPDATE users SET reputation = reputation + 5
+                          WHERE id = %(user_id)s''', {'user_id': user_id})
+
+    elif mode == 'accept':
+        cursor.execute('''UPDATE users SET reputation = reputation + 15
+                          WHERE id = %(user_id)s''', {'user_id': user_id})
+
+
+@connection.connection_handler
+def reduce_reputation(cursor, user_id):
+    cursor.execute('''UPDATE users SET reputation = reputation - 2
+                      WHERE id = %(user_id)s''', {'user_id': user_id})
+
+
+
+
