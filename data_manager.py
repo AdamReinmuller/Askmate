@@ -424,11 +424,8 @@ def get_userid_by_username(cursor, username):
                         SELECT id FROM users
                         WHERE username = %(username)s
                        """, {'username': username})
-    try:
-        id = cursor.fetchone()['id']
-        return id
-    except:
-        return False
+    id = cursor.fetchone()['id']
+    return id
 
 @connection.connection_handler
 def get_hashpw_of_username(cursor, username):
