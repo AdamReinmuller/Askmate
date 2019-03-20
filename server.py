@@ -341,7 +341,7 @@ def register():
             return render_template('registration.html', invalid_username=invalid_username)
 
 
-@app.route('/login.html', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         good_hash_pw = data_manager.get_hashpw_of_username(request.form['username'])
