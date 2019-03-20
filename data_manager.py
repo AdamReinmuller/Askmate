@@ -393,7 +393,7 @@ def update_view_number_in_question_by_id(cursor, id):
 @connection.connection_handler
 def get_five_latest_submitted_titles_with_ids_from_table(cursor, table):
     cursor.execute(sql.SQL("""
-                    SELECT title, id FROM {table} 
+                    SELECT title, id, users_id FROM {table} 
                     ORDER BY submission_time DESC
                     LIMIT 5
                    """).format(table=sql.Identifier(table)))
