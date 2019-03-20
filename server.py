@@ -279,7 +279,7 @@ def accept_answer(answer_id):
     data_manager.accept_answer(answer_id)
     user_id = data_manager.get_user_id_by_answer_id(answer_id)
     data_manager.increase_reputation('accept', user_id)
-    question_id = data_manager.get_foreign_key_by_id(data_manager.answer_db, 'question_id', answer_id)
+    question_id = data_manager.get_foreign_key_by_id(data_manager.answer_db, 'question_id', answer_id)[0]['question_id']
     return redirect('/question/{}'.format(question_id))
 
 
