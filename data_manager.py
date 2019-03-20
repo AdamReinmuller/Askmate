@@ -79,8 +79,8 @@ def add_answer(cursor, question_id, message, users_id):
     """
     current_time = util.get_time()
     cursor.execute("""INSERT INTO answer
-                      (submission_time, vote_number, question_id, message, image, users_id)
-                      VALUES ( %(submission_time)s, 0, %(question_id)s, %(message)s, 'no image', %(users_id)s)
+                      (submission_time, vote_number, question_id, message, image, users_id, accepted_status)
+                      VALUES ( %(submission_time)s, 0, %(question_id)s, %(message)s, 'no image', %(users_id)s, FALSE)
                     """,
                    dict(submission_time=current_time, question_id=question_id, message=message, users_id=users_id)
                    )
@@ -142,6 +142,15 @@ def update_answer(cursor, id_, message):
                       WHERE id = %(id_)s
                         """,
                    dict(id_=id_, message=message)
+                   )
+
+@connection.connection_handler
+def accept_answer(cursor, id_):
+    cursor.execute("""UPDATE answer
+                      SET accepted_status = TRUE
+                      WHERE id = %(id_)s
+                        """,
+                   dict(id_=id_)
                    )
 
 
@@ -260,12 +269,35 @@ def get_line_data_by_id(cursor, table, id):
 @connection.connection_handler
 def get_comments_data_by_foreign_id(cursor, foreign_id_name, id):
     cursor.execute(sql.SQL("""
-                    SELECT id, message, submission_time, edited_count FROM comment
+                    SELECT id, message, submission_time, edited_count, users_id FROM comment
                     WHERE {foreign_id_name} = %(id)s
                     ORDER BY submission_time DESC;
                    """).format(foreign_id_name=sql.Identifier(foreign_id_name)), {'id': id})
     comments_data = cursor.fetchall()
     return comments_data
+
+
+@connection.connection_handler
+def get_question_comments_message_with_question_by_foreign_id(cursor, foreign_id_name, id):
+    cursor.execute(sql.SQL("""
+                    SELECT comment.message, comment.question_id, title FROM comment join question on question_id=question.id
+                    WHERE question_id is not null And comment.{foreign_id_name} = %(id)s 
+                    ORDER BY comment.message ASC;
+                   """).format(foreign_id_name=sql.Identifier(foreign_id_name)), {'id': id})
+    comments_data = cursor.fetchall()
+    return comments_data
+
+@connection.connection_handler
+def get_answer_comments_message_with_answer_and_question_by_foreign_id(cursor, foreign_id_name, id):
+    cursor.execute(sql.SQL("""
+                    SELECT comment.message AS "comment message", comment.answer_id, answer.message AS "answer message", answer.question_id, title 
+                    FROM (comment join answer on answer_id=answer.id) join question on answer.question_id=question.id
+                    WHERE answer_id is not null And comment.{foreign_id_name} = %(id)s 
+                    ORDER BY comment.message ASC;
+                   """).format(foreign_id_name=sql.Identifier(foreign_id_name)), {'id': id})
+    comments_data = cursor.fetchall()
+    return comments_data
+
 
 
 @connection.connection_handler
@@ -277,6 +309,18 @@ def get_lines_data_by_foreign_id(cursor, table, foreign_id_name, id):
                    """).format(table=sql.Identifier(table), foreign_id_name=sql.Identifier(foreign_id_name)), {'id': id})
     lines_data = cursor.fetchall()
     return lines_data
+
+
+@connection.connection_handler
+def get_answers_with_their_questions_by_foreign_id(cursor, foreign_id_name, id):
+    cursor.execute(sql.SQL("""
+                    SELECT answer.message, question.id AS question_id, question.title FROM answer join question on question_id=question.id
+                    WHERE answer.{foreign_id_name} = %(id)s
+                    ORDER BY answer.message ASC;
+                   """).format(foreign_id_name=sql.Identifier(foreign_id_name)), {'id': id})
+    lines_data = cursor.fetchall()
+    return lines_data
+
 
 
 @connection.connection_handler
@@ -432,9 +476,11 @@ def get_userid_by_username(cursor, username):
                         SELECT id FROM users
                         WHERE username = %(username)s
                        """, {'username': username})
-    id = cursor.fetchone()['id']
-    return id
-
+    try:
+        id = cursor.fetchone()['id']
+        return id
+    except:
+        return False
 
 @connection.connection_handler
 def get_hashpw_of_username(cursor, username):
