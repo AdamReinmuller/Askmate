@@ -268,6 +268,10 @@ def add_edit_question(question_id=None):
 
 @app.route('/question/<int:question_id>/add-tag', methods=['GET', 'POST'])
 def add_tag_to_question(question_id=None):
+    try:
+        user_id = data_manager.get_userid_by_username(session['username'])
+    except KeyError:
+        return redirect('/')
     if request.method == 'GET':
         question = data_manager.get_question_by_id(question_id)
         question_title = question[0]['title']
