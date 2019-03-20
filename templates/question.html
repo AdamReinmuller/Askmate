@@ -7,12 +7,13 @@
     <link rel="icon" href="{{ url_for('static', filename='icons/Askmate.ico') }}">
 </head>
 <body>
- {% include 'alert.html' %}
+{% include 'alert.html' %}
 <h1>Details of Question</h1>
 <h4><a href="/">Back to Main page</a></h4>
- {% if session['username'] %}
+{% if session['username'] %}
     <h4><a href="/logout">Logout</a></h4>
     <h4><a href="/user/{{ user_id }}">Your activities - {{ session['username'] }}'s user page</a></h4>
+    <h4><a href="/list">List of all questions</a></h4>
     <h4><a href="/add-question">Add new question</a></h4>
 {% else %}
     <h4><a href="/registration">Register</a></h4>
@@ -45,10 +46,10 @@
         </tr>
     {% endfor %}
 </table>
- {% for a_ques in question %}
- {% include 'question-comments.html' %}
-        {% include 'question_buttons.html' %}
-   {% endfor %}
+{% for a_ques in question %}
+    {% include 'question-comments.html' %}
+    {% include 'question_buttons.html' %}
+{% endfor %}
 
 {% if answers != [] %}
     <h3>Answers to the Question:</h3>
