@@ -291,13 +291,33 @@ def register():
         return render_template('registration.html')
     elif request.method == 'POST':
         username = request.form['username']
-        password = util.hash_password(request.form['password'])
+        password = request.form['password']
         try:
             data_manager.register_user(username, password)
             return redirect('/')
         except:
             invalid_username = 'Username is taken'
             return render_template('registration.html', invalid_username=invalid_username)
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        good_hash_pw = data_manager.get_hashpw_of_username(request.form['username'])
+        if good_hash_pw and util.verify_password(request.form['password'], good_hash_pw):
+            session['username'] = request.form['username']
+            return redirect('/')
+        else:
+            invalid_username_or_password = 'invalid username or password'
+            return render_template('login', invalid_username_or_password=invalid_username_or_password)
+    elif request.method == 'GET':
+        return render_template('login')
+
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    return redirect('/')
 
 
 if __name__ == '__main__':

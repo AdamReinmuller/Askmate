@@ -7,7 +7,6 @@
     <link rel="icon" href="{{ url_for('static', filename='icons/Askmate.ico') }}">
 </head>
 <body>
-
 {% if session['username'] %}
     <h1>Welcome {{ session['username'] }} to Askmate</h1>
     <h4><a href="/logout">Logout</a></h4>
