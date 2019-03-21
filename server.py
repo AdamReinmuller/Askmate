@@ -123,6 +123,7 @@ def route_user(user_id):
 
 @app.route('/question/<int:question_id>')
 def route_question(question_id):
+    answer_statuses = list(map(lambda x: x['accepted_status'], data_manager.import_from_db(data_manager.answer_db)))
     user_id = data_manager.get_userid_by_username(session.get('username'))
     question = data_manager.get_line_data_by_id(data_manager.question_db, question_id)
     headers_q = data_manager.get_column_names_of_table(data_manager.question_db)
@@ -145,7 +146,7 @@ def route_question(question_id):
                            comments_q=comments_q, headers_c=headers_c, answers=answers,
                            headers_a=headers_a, image_q=image_q, filename_q=filename_q, answer_ids=answer_ids,
                            tags=tags, user_id=user_id, voted_questions_of_user=voted_questions_of_user,
-                           voted_answers_of_user=voted_answers_of_user)
+                           voted_answers_of_user=voted_answers_of_user, answer_statuses=answer_statuses)
 
 
 @app.route('/question/<int:question_id>/view_counter')
@@ -279,7 +280,11 @@ def delete_answer(answer_id=None):
 
 @app.route('/answer/<answer_id>/accept')
 def accept_answer(answer_id):
-    data_manager.accept_answer(answer_id)
+    answer_statuses = list(map(lambda x:x['accepted_status'], data_manager.import_from_db(data_manager.answer_db)))
+    if True not in answer_statuses:
+        data_manager.accept_answer(answer_id)
+    else:
+        flash('You can only accept one answer')
     user_id = data_manager.get_user_id_by_answer_id(answer_id)
     data_manager.increase_reputation('accept', user_id)
     question_id = data_manager.get_foreign_key_by_id(data_manager.answer_db, 'question_id', answer_id)[0]['question_id']
