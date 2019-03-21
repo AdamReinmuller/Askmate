@@ -9,29 +9,34 @@
 <body>
 {% include 'alert.html' %}
 <h1>List of all registered users</h1>
-<h4><a href="/">Back to Main page</a></h4>
-{% if session['username'] %}
-    <h4><a href="/logout">Logout</a></h4>
-    <h4><a href="/user/{{ user_id }}">Your activities - {{ session['username'] }}'s user page</a></h4>
-    <br>
-    <table style="width:90%" border="1">
-        <tr>
-            {% for header in headers %}
-                <th>{{ header }} <br> <a href="/user-list/?order_by={{ header }}&order_direction=asc">↑</a> <a
-                        href="/user-list/?order_by={{ header }}&order_direction=desc">↓</a></th>
-            {% endfor %}
-        </tr>
-        {% for user in users %}
+<div class="menu">
+    <a href="/" class="menu_point">Back to Main page</a>
+    {% if session['username'] %}
+        <a href="/logout" class="menu_point">Logout</a>
+        <a href="/user/{{ user_id }}" class="menu_point">Your activities - {{ session['username'] }}'s user page</a>
+        </div>
+        <br>
+        <table style="width:90%" border="1">
             <tr>
-                {% for key, value in user.items() %}
-                    <td>{{ value }}</td>
+                {% for header in headers %}
+                    <th>{{ header }} <br> <a href="/user-list/?order_by={{ header }}&order_direction=asc">↑</a> <a
+                            href="/user-list/?order_by={{ header }}&order_direction=desc">↓</a></th>
                 {% endfor %}
             </tr>
-        {% endfor %}
-    </table>
-{% else %}
-    <h4><a href="/registration">Register</a></h4>
-    <h4><a href="/login">Login</a></h4>
-{% endif %}
+            {% for user in users %}
+                <tr>
+                    {% for key, value in user.items() %}
+                        <td>{{ value }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <div class="menu">
+        <a href="/registration" class="menu_point">Register</a>
+        <a href="/login" class="menu_point">Login</a>
+        </div>
+    {% endif %}
+
 </body>
 </html>

@@ -5,15 +5,15 @@
     <title>Login</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
+<body id="login_form_parent">
 <form id="login_form" method="post">
     <h1>Login</h1>
-    <h4><a href="/">Back to Main page</a></h4>
-    <h4><a href="/registration">Register</a></h4>
+    <a href="/" class="login_link">Back to Main page</a>
+    <a href="/registration" class="login_link">Register</a>
     <p>Username:</p>
-    <input type="text" name="username"><br>
+    <input type="text" name="username">
     <p>Password:</p>
-    <input type="password" name="password"><br>
+    <input type="password" name="password">
     <input type="submit" value="Login">
     {% if invalid_username_or_password %}
         <p id="invalid_username_or_password">{{ invalid_username_or_password }}</p>
