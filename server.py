@@ -361,18 +361,25 @@ def accept_answer(answer_id):
 
 @app.route('/question/<int:question_id>/delete')
 def delete_question(question_id=None):
-    data_manager.delete_line_by_foreign_id(data_manager.comment_db, 'question_id', question_id)
-    filename = 'static/image_for_question' + str(question_id) + '.png'
-    if util.check_file(filename):
-        util.delete_file(filename)
-    answer_ids_to_delete = data_manager.get_ids_by_foreign_id(data_manager.answer_db, 'question_id', question_id)
-    for answer_id in answer_ids_to_delete:
-        data_manager.delete_line_by_foreign_id(data_manager.comment_db, 'answer_id', answer_id['id'])
-        filename = 'static/image_for_answer' + str(answer_id['id']) + '.png'
+    try:
+        user_id = data_manager.get_userid_by_username(session['username'])
+    except KeyError:
+        return redirect('/')
+    if user_id == data_manager.get_foreign_key_by_id(data_manager.question_db, 'users_id', question_id)[0]['users_id']:
+        data_manager.delete_line_by_foreign_id(data_manager.comment_db, 'question_id', question_id)
+        filename = 'static/image_for_question' + str(question_id) + '.png'
         if util.check_file(filename):
             util.delete_file(filename)
-    data_manager.delete_answer_by_question_id(question_id)
-    data_manager.delete_question(question_id)
+        answer_ids_to_delete = data_manager.get_ids_by_foreign_id(data_manager.answer_db, 'question_id', question_id)
+        for answer_id in answer_ids_to_delete:
+            data_manager.delete_line_by_foreign_id(data_manager.comment_db, 'answer_id', answer_id['id'])
+            filename = 'static/image_for_answer' + str(answer_id['id']) + '.png'
+            if util.check_file(filename):
+                util.delete_file(filename)
+        data_manager.delete_answer_by_question_id(question_id)
+        data_manager.delete_question(question_id)
+    else:
+        flash('Invalid user')
     return redirect('/list')
 
 

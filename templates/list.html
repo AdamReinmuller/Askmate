@@ -7,6 +7,7 @@
     <link rel="icon" href="{{ url_for('static', filename='icons/Askmate.ico') }}">
 </head>
 <body>
+{% include 'alert.html' %}
 <h1>List of all questions</h1>
 <h4><a href="/">Back to Main page</a></h4>
 {% if session['username'] %}
