@@ -17,12 +17,25 @@ def index():
 @app.route('/list')
 @app.route('/list/')
 def route_list():
+    user_id = data_manager.get_userid_by_username(session.get('username'))
     questions = data_manager.import_from_db(data_manager.question_db)
     headers = data_manager.get_column_names_of_table(data_manager.question_db)
     if request.args:
         questions = data_manager.sort_table(data_manager.question_db, request.args['order_by'],
                                             request.args['order_direction'])
-    return render_template('list.html', questions=questions, headers=headers)
+    return render_template('list.html', questions=questions, headers=headers, user_id=user_id)
+
+
+@app.route('/user-list')
+@app.route('/user-list/')
+def route_user_list():
+    user_id = data_manager.get_userid_by_username(session.get('username'))
+    users = data_manager.import_from_db(data_manager.users_db)
+    headers = data_manager.get_column_names_of_table(data_manager.users_db)
+    if request.args:
+        users = data_manager.sort_table(data_manager.users_db, request.args['order_by'],
+                                            request.args['order_direction'])
+    return render_template('user_list.html', users=users, headers=headers, user_id=user_id)
 
 
 @app.route('/question/<int:question_id>/new-comment', methods=['GET', 'POST'])
@@ -101,6 +114,7 @@ def edit_comment(comment_id):
 
 @app.route('/user/<int:user_id>')
 def route_user(user_id):
+    user_reputation = data_manager.get_reputation_by_id(user_id)
     questions_of_user = data_manager.get_lines_data_by_foreign_id(data_manager.question_db, 'users_id', user_id)
     user_answers_questions = data_manager.get_answers_with_their_questions_by_foreign_id('users_id', user_id)
     question_comments = data_manager.get_question_comments_message_with_question_by_foreign_id('users_id', user_id)
@@ -108,13 +122,15 @@ def route_user(user_id):
     headers_q = data_manager.get_column_names_of_table(data_manager.question_db)
     headers_c = data_manager.get_column_names_of_table(data_manager.comment_db)
     headers_a = data_manager.get_column_names_of_table(data_manager.answer_db)
-    return render_template('user.html', questions_of_user=questions_of_user, user_answers_questions=user_answers_questions,
+    return render_template('user_page.html', questions_of_user=questions_of_user, user_answers_questions=user_answers_questions,
                            question_comments=question_comments, answer_comments=answer_comments,
-                           headers_q=headers_q, headers_a=headers_a, headers_c=headers_c, )
+                           headers_q=headers_q, headers_a=headers_a, headers_c=headers_c, reputation=user_reputation, user_id=user_id)
 
 
 @app.route('/question/<int:question_id>')
 def route_question(question_id):
+    answer_statuses = list(map(lambda x: x['accepted_status'], data_manager.import_from_db(data_manager.answer_db)))
+    user_id = data_manager.get_userid_by_username(session.get('username'))
     question = data_manager.get_line_data_by_id(data_manager.question_db, question_id)
     headers_q = data_manager.get_column_names_of_table(data_manager.question_db)
     headers_c = data_manager.get_column_names_of_table(data_manager.comment_db)[3:5]
@@ -130,10 +146,13 @@ def route_question(question_id):
                                     '/static/image_for_answer' + str(answer['id']) + '.png',
                                     data_manager.get_lines_data_by_foreign_id(data_manager.comment_db, 'answer_id',
                                                                               answer['id'])]
+    voted_questions_of_user = list(map(lambda x:x['question_id'], data_manager.get_foreign_key_by_id(data_manager.user_vote_db, 'question_id', user_id)))
+    voted_answers_of_user = list(map(lambda x:x['answer_id'], data_manager.get_foreign_key_by_id(data_manager.user_vote_db, 'answer_id', user_id)))
     return render_template('question.html', question_id=question_id, question=question, headers_q=headers_q,
                            comments_q=comments_q, headers_c=headers_c, answers=answers,
                            headers_a=headers_a, image_q=image_q, filename_q=filename_q, answer_ids=answer_ids,
-                           tags=tags)
+                           tags=tags, user_id=user_id, voted_questions_of_user=voted_questions_of_user,
+                           voted_answers_of_user=voted_answers_of_user, answer_statuses=answer_statuses)
 
 
 @app.route('/question/<int:question_id>/view_counter')
@@ -311,8 +330,14 @@ def delete_answer(answer_id=None):
 
 @app.route('/answer/<answer_id>/accept')
 def accept_answer(answer_id):
-    data_manager.accept_answer(answer_id)
-    question_id = data_manager.get_foreign_key_by_id(data_manager.answer_db, 'question_id', answer_id)
+    answer_statuses = list(map(lambda x:x['accepted_status'], data_manager.import_from_db(data_manager.answer_db)))
+    if True not in answer_statuses:
+        data_manager.accept_answer(answer_id)
+    else:
+        flash('You can only accept one answer')
+    user_id = data_manager.get_user_id_by_answer_id(answer_id)
+    data_manager.increase_reputation('accept', user_id)
+    question_id = data_manager.get_foreign_key_by_id(data_manager.answer_db, 'question_id', answer_id)[0]['question_id']
     return redirect('/question/{}'.format(question_id))
 
 
@@ -335,21 +360,35 @@ def delete_question(question_id=None):
 
 @app.route('/question/<int:question_id>/<int:id>/<file_>/<method>')
 def vote(question_id=None, id=None, file_=None, method=None):
+    users_id = data_manager.get_userid_by_username(session['username'])
     if file_ == 'answer':
         data_manager.change_vote_number_in_table(data_manager.answer_db, id, method)
+        data_manager.add_vote_to_user_vote(None, id, users_id)
+        user_id = data_manager.get_user_id_by_answer_id(id)
+        if method == 'up':
+            data_manager.increase_reputation('answer', user_id=user_id)
+        elif method == 'down':
+            data_manager.reduce_reputation(user_id=user_id)
     else:
         data_manager.change_vote_number_in_table(data_manager.question_db, id, method)
+        data_manager.add_vote_to_user_vote(id, None, users_id)
+        user_id = data_manager.get_user_id_by_question_id(id)
+        if method == 'up':
+            data_manager.increase_reputation('question', user_id=user_id)
+        elif method == 'down':
+            data_manager.reduce_reputation(user_id=user_id)
     return redirect('/question/{}'.format(question_id))
 
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
+    user_id = data_manager.get_userid_by_username(session.get('username'))
     search_phrase = request.form['search_phrase']
     headers = data_manager.get_column_names_of_table(data_manager.question_db)
     questions = data_manager.search(search_phrase)
     answers = data_manager.search_answers(search_phrase)
     return render_template('search_results.html', questions=questions, answers=answers,
-                           headers=headers, search_phrase=search_phrase)
+                           headers=headers, search_phrase=search_phrase, user_id=user_id)
 
 
 @app.route('/registration', methods=['GET', 'POST'])

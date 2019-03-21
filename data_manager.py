@@ -8,6 +8,7 @@ comment_db = 'comment'
 tag_db = 'tag'
 question_tag_db = 'question_tag'
 users_db = 'users'
+user_vote_db = 'user_vote'
 
 
 @connection.connection_handler
@@ -44,18 +45,18 @@ def sort_table(table, key="", sort=""):
     :sort: asc or desc
     :return: questions in a list of ordered dictionaries
     """
-    questions = import_from_db(table)
+    table_to_sort = import_from_db(table)
     if sort == 'desc':
         try:
-            questions = sorted(questions, key=lambda x: int(x[key]), reverse=True)
+            table_to_sort = sorted(table_to_sort, key=lambda x: int(x[key]), reverse=True)
         except:
-            questions = sorted(questions, key=lambda x: x[key], reverse=True)
+            table_to_sort = sorted(table_to_sort, key=lambda x: x[key], reverse=True)
     elif sort == 'asc':
         try:
-            questions = sorted(questions, key=lambda x: int(x[key]), reverse=False)
+            table_to_sort = sorted(table_to_sort, key=lambda x: int(x[key]), reverse=False)
         except:
-            questions = sorted(questions, key=lambda x: x[key], reverse=False)
-    return questions
+            table_to_sort = sorted(table_to_sort, key=lambda x: x[key], reverse=False)
+    return table_to_sort
 
 
 @connection.connection_handler
@@ -333,6 +334,14 @@ def add_comment_to_table(cursor, table, id_type, id, message, submission_time, e
 
 
 @connection.connection_handler
+def add_vote_to_user_vote(cursor, question_id, answer_id, users_id,):
+    cursor.execute("""
+                    INSERT INTO user_vote (question_id, answer_id, id)
+                    VALUES (%(question_id)s, %(answer_id)s, %(users_id)s)
+                   """,
+                   {'question_id': question_id, 'answer_id': answer_id, 'users_id': users_id})
+
+@connection.connection_handler
 def delete_line_by_id(cursor, table, id):
     cursor.execute(sql.SQL("""
                             DELETE FROM {table}
@@ -393,7 +402,7 @@ def update_view_number_in_question_by_id(cursor, id):
 @connection.connection_handler
 def get_five_latest_submitted_titles_with_ids_from_table(cursor, table):
     cursor.execute(sql.SQL("""
-                    SELECT title, id FROM {table} 
+                    SELECT title, id, users_id FROM {table} 
                     ORDER BY submission_time DESC
                     LIMIT 5
                    """).format(table=sql.Identifier(table)))
@@ -417,9 +426,6 @@ def get_questions_by_tag(cursor, tag_name):
                       WHERE tag.name = %(tag_name)s''', {'tag_name':tag_name})
     data = cursor.fetchall()
     return data
-
-if __name__ == '__main__':
-    print(get_tags_and_question_count())
 
 
 @connection.connection_handler
@@ -496,3 +502,48 @@ def get_hashpw_of_username(cursor, username):
         return hashpw
     except:
         return False
+
+
+@connection.connection_handler
+def increase_reputation(cursor, mode, user_id):
+    if mode == 'answer':
+        cursor.execute('''UPDATE users SET reputation = reputation + 10
+                          WHERE id = %(user_id)s''', {'user_id':user_id})
+
+    elif mode == 'question':
+        cursor.execute('''UPDATE users SET reputation = reputation + 5
+                          WHERE id = %(user_id)s''', {'user_id': user_id})
+
+    elif mode == 'accept':
+        cursor.execute('''UPDATE users SET reputation = reputation + 15
+                          WHERE id = %(user_id)s''', {'user_id': user_id})
+
+
+@connection.connection_handler
+def reduce_reputation(cursor, user_id):
+    cursor.execute('''UPDATE users SET reputation = reputation - 2
+                      WHERE id = %(user_id)s''', {'user_id': user_id})
+
+
+@connection.connection_handler
+def get_user_id_by_question_id(cursor, question_id=1):
+    cursor.execute('''SELECT users_id FROM question
+    WHERE id = %(question_id)s''', {'question_id':question_id})
+    user_id = cursor.fetchone()['users_id']
+    return user_id
+
+
+@connection.connection_handler
+def get_user_id_by_answer_id(cursor, answer_id=1):
+    cursor.execute('''SELECT users_id FROM answer
+    WHERE id = %(answer_id)s''', {'answer_id':answer_id})
+    user_id = cursor.fetchone()['users_id']
+    return user_id
+
+
+@connection.connection_handler
+def get_reputation_by_id(cursor, user_id):
+    cursor.execute('''SELECT reputation FROM users
+    WHERE id = %(user_id)s''', {'user_id':user_id})
+    reputation = cursor.fetchone()['reputation']
+    return reputation

@@ -1,44 +1,55 @@
-<div class="question_buttons">
-    <table align="center" cellpadding="40">
-        <tr>
-            <td>
-                <a href="/question/{{ question_id }}/new-answer">Add an answer</a>
-            </td>
-            <td>
-                <a href="/question/{{ question_id }}/delete" onclick="return confirm('Are you sure?')">Delete
-                    question</a>
-            </td>
-            <td>
-                <a href="/add-question/{{ question_id }}">Edit question</a>
-            </td>
-            <td>
-                <a href="/question/{{ question_id }}/{{ question_id }}/question/up">
-                    <img src='{{ url_for('static', filename='icons/voteup.png') }}' alt="here should be vote up image"
-                         width="40" height="40">
-                </a><br>
-            </td>
-            <td>
-                <a href="/question/{{ question_id }}/{{ question_id }}/question/down">
-                    <img src='{{ url_for('static', filename='icons/votedown.png') }}'
-                         alt="here should be vote down image"
-                         width="40" height="40">
-                </a><br>
-            </td>
-            <td>
-                <a href="/question/{{ question_id }}/new-comment">Add comment</a><br>
-            </td>
-            <td>
-                <a href="/question/{{ question_id }}/add-tag">Add tag</a><br>
-            </td>
-            {% if image_q %}
+{% if session['username'] %}
+    <div class="question_buttons">
+        <table align="center" cellpadding="40">
+            <tr>
                 <td>
-                    <a href="/question/{{ a_ques['id'] }}/delete-image">Delete image</a>
+                    <a href="/question/{{ question_id }}/add-tag">Add tag</a><br>
                 </td>
-            {% else %}
-                <td>
-                    <a href="/question/{{ a_ques['id'] }}/add-image">Add image</a>
-                </td>
-            {% endif %}
-        </tr>
-    </table>
-</div>
+
+                {% if user_id != question[0]['users_id'] %}
+                    <td>
+                        <a href="/question/{{ question_id }}/new-answer">Add an answer</a>
+                    </td>
+                    <td>
+                        <a href="/question/{{ question_id }}/new-comment">Add comment</a><br>
+                    </td>
+                    {% if question_id not in voted_questions_of_user %}
+                        <td>
+                            <a href="/question/{{ question_id }}/{{ question_id }}/question/up">
+                                <img src='{{ url_for('static', filename='icons/voteup.png') }}'
+                                     alt="here should be vote up image"
+                                     width="40" height="40" title="vote up">
+                            </a><br>
+                        </td>
+                        <td>
+                            <a href="/question/{{ question_id }}/{{ question_id }}/question/down">
+                                <img src='{{ url_for('static', filename='icons/votedown.png') }}'
+                                     alt="here should be vote down image"
+                                     width="40" height="40" title="vote down">
+                            </a><br>
+                        </td>
+                    {% endif %}
+                {% endif %}
+                {% if user_id == question[0]['users_id'] %}
+                    <td>
+                        <a href="/question/{{ question_id }}/delete" onclick="return confirm('Are you sure?')">Delete
+                            question</a>
+                    </td>
+                    <td>
+                        <a href="/add-question/{{ question_id }}">Edit question</a>
+                    </td>
+
+                    {% if image_q %}
+                        <td>
+                            <a href="/question/{{ a_ques['id'] }}/delete-image">Delete image</a>
+                        </td>
+                    {% else %}
+                        <td>
+                            <a href="/question/{{ a_ques['id'] }}/add-image">Add image</a>
+                        </td>
+                    {% endif %}
+                {% endif %}
+            </tr>
+        </table>
+    </div>
+{% endif %}

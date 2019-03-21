@@ -1,34 +1,44 @@
 <div class="answer-comments">
-{% if answer_ids[answer['id']][2] != [] %}
-    <p>Comments to the answer:</p>
-    <table style="width:90%" border="1">
-        <tr>
-            {% for header in headers_c %}
-                <th>{{ header }}</th>
-            {% endfor %}
-            <th>Delete comment</th>
-            <th>Edit comment</th>
-        </tr>
-        {% for comment in answer_ids[answer['id']][2] %}
+    {% if answer_ids[answer['id']][2] != [] %}
+        <p>Comments to the answer:</p>
+        <table style="width:90%" border="1">
             <tr>
-                <td>{{ comment['message'] }}<br>
-                    {% if comment['edited_count'] > 0 %}
-                    <p>Edited {{ comment['edited_count'] }} times.<p>
-                    {% endif %}
-                </td>
-                <td>{{ comment['submission_time'] }}</td>
-                <td>
-                    <a href="/comments/{{ comment['id'] }}/delete" onclick="return confirm('Are you sure?')">
-                        <img src='{{ url_for('static', filename='icons/recycle_bin.png') }}'
-                             alt="here should be recycle bin image"
-                             width="40" height="40">
-                    </a>
-                </td>
-                <td>
-                    <a href="/comments/{{ comment['id'] }}/edit">Edit comment</a>
-                </td>
+                {% for header in headers_c %}
+                    <th>{{ header }}</th>
+                {% endfor %}
+                {% if session['username'] %}
+                    <th>Delete comment</th>
+                    <th>Edit comment</th>
+                {% endif %}
             </tr>
-        {% endfor %}
-    </table>
-{% endif %}
+            {% for comment in answer_ids[answer['id']][2] %}
+                <tr>
+                    <td>{{ comment['message'] }}<br>
+                        {% if comment['edited_count'] > 0 %}
+                            <p>Edited {{ comment['edited_count'] }} times.<p>
+                        {% endif %}
+                    </td>
+                    <td>{{ comment['submission_time'] }}</td>
+                    {% if session['username'] %}
+                        {% if user_id == comment['users_id'] %}
+                            <td>
+                                <a href="/comments/{{ comment['id'] }}/delete"
+                                   onclick="return confirm('Are you sure?')">
+                                    <img src='{{ url_for('static', filename='icons/recycle_bin.png') }}'
+                                         alt="here should be recycle bin image"
+                                         width="40" height="40" title="delete comment">
+                                </a>
+                            </td>
+                            <td>
+                                <a href="/comments/{{ comment['id'] }}/edit">Edit comment</a>
+                            </td>
+                        {% else %}
+                            <td>Not authorised</td>
+                            <td>Not authorised</td>
+                        {% endif %}
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
 </div>

@@ -11,6 +11,7 @@
     <h1>Welcome {{ session['username'] }} to Askmate</h1>
     <h4><a href="/logout">Logout</a></h4>
     <h4><a href="/user/{{ user_id }}">Your activities - {{ session['username'] }}'s user page</a></h4>
+    <h4><a href="/user-list">List of all registered users</a></h4>
     <h4><a href="/list">List of all questions</a></h4>
     <h4><a href="/add-question">Add new question</a></h4>
 {% else %}
@@ -40,16 +41,28 @@
                 <a href="/question/{{ question['id'] }}/view_counter">{{ question['title'] }}</a>
             </td>
             {% if session['username'] %}
-                <td>
-                    <a href="/question/{{ question['id'] }}/new-answer">Add an answer</a>
-                </td>
-                <td>
-                    <a href="/question/{{ question['id'] }}/delete" onclick="return confirm('Are you sure?')">Delete
-                        question</a>
-                </td>
-                <td>
-                    <a href="/add-question/{{ question['id'] }}">Edit question</a>
-                </td>
+                {% if user_id != question['users_id'] %}
+                    <td>
+                        <a href="/question/{{ question['id'] }}/new-answer">Add an answer</a>
+                    </td>
+                {% else %}
+                    <td>
+                    </td>
+                {% endif %}
+                {% if user_id == question['users_id'] %}
+                    <td>
+                        <a href="/question/{{ question['id'] }}/delete" onclick="return confirm('Are you sure?')">Delete
+                            question</a>
+                    </td>
+                    <td>
+                        <a href="/add-question/{{ question['id'] }}">Edit question</a>
+                    </td>
+                {% else %}
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                {% endif %}
             {% endif %}
         </tr>
     {% endfor %}

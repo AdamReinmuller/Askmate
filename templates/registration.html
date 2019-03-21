@@ -1,22 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Registration</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta charset="UTF-8">
+    <title>Registration</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-
-    <form id="registration_form" method="post">
-        <h1>Register account</h1>
-        <p>Username</p>
-        <input type="text" minlength="4" name="username"><br>
-        {% if invalid_username %}
-            <p id="invalid_username">{{ invalid_username }}</p>
-        {% endif %}
-        <p>Password</p>
-        <input type="password" minlength="6" name="password"><br>
-        <input type="submit" value="Register">
-    </form>
+<form id="registration_form" method="post">
+    <h1>Register account</h1>
+    <h4><a href="/">Back to Main page</a></h4>
+    <h4><a href="/login">Login</a></h4>
+    <p>Username</p>
+    <input type="text" minlength="4" name="username"><br>
+    {% if invalid_username %}
+        <p id="invalid_username">{{ invalid_username }}</p>
+    {% endif %}
+    <p>Password</p>
+    <input type="password" minlength="6" name="password"><br>
+    <input type="submit" value="Register">
+</form>
 </body>
 </html>
