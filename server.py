@@ -291,17 +291,19 @@ def add_tag_to_question(question_id=None):
         user_id = data_manager.get_userid_by_username(session['username'])
     except KeyError:
         return redirect('/')
-    if request.method == 'GET':
-        question = data_manager.get_question_by_id(question_id)
+    if request.method == 'GET' and user_id == data_manager.get_foreign_key_by_id(data_manager.question_db, 'users_id', question_id)[0]['users_id']:
+        question = data_manager.get_question_by_id(question_id)  # add tag get
         question_title = question[0]['title']
         tags = data_manager.get_tags(question_id)
         return render_template('add_tag.html', question_title=question_title, tags=tags, question_id=question_id)
-    else:
+    elif request.method == 'POST' and user_id == data_manager.get_foreign_key_by_id(data_manager.question_db, 'users_id', question_id)[0]['users_id']:
         question = data_manager.get_question_by_id(question_id)
         question_id_to_add = question[0]['id']
         tag = request.form['new_tag']
         data_manager.add_tag_to_question(question_id_to_add, tag)
-        return redirect('/question/{}'.format(question_id))
+    else:  # not authorized to add tag
+        flash('Invalid user')
+    return redirect('/question/{}'.format(question_id))
 
 
 @app.route('/question/<int:question_id>/<int:tag_id>/delete-tag')
@@ -310,21 +312,31 @@ def delete_tag(question_id=None, tag_id=None):
         user_id = data_manager.get_userid_by_username(session['username'])
     except KeyError:
         return redirect('/')
-    try:
-        data_manager.delete_tag(question_id, tag_id)
-    except:
-        pass
-    finally:
+    if user_id == data_manager.get_foreign_key_by_id(data_manager.question_db, 'users_id', question_id)[0]['users_id']:
+        try:
+            data_manager.delete_tag(question_id, tag_id)
+        finally:
+            return redirect('/question/{}'.format(question_id))
+    else:
+        flash('Invalid user')
         return redirect('/question/{}'.format(question_id))
 
 
 @app.route('/answer/<answer_id>/delete')
 def delete_answer(answer_id=None):
-    data_manager.delete_line_by_foreign_id(data_manager.comment_db, 'answer_id', answer_id)
-    question_id = data_manager.delete_answer_by_id(answer_id)['question_id']
-    filename = 'static/image_for_answer' + str(answer_id) + '.png'
-    if util.check_file(filename):
-        util.delete_file(filename)
+    try:
+        user_id = data_manager.get_userid_by_username(session['username'])
+    except KeyError:
+        return redirect('/')
+    question_id = data_manager.get_foreign_key_by_id(data_manager.answer_db, 'question_id', answer_id)[0]['question_id']
+    if user_id == data_manager.get_foreign_key_by_id(data_manager.answer_db, 'users_id', answer_id)[0]['users_id']:
+        data_manager.delete_line_by_foreign_id(data_manager.comment_db, 'answer_id', answer_id)
+        question_id = data_manager.delete_answer_by_id(answer_id)['question_id']
+        filename = 'static/image_for_answer' + str(answer_id) + '.png'
+        if util.check_file(filename):
+            util.delete_file(filename)
+    else:
+        flash('Invalid user')
     return redirect('/question/{}'.format(question_id))
 
 
