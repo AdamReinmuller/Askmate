@@ -6,18 +6,18 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='icons/Askmate.ico') }}">
 </head>
-<body>
+<body id="login_form_parent">
 <form id="registration_form" method="post">
     <h1>Register account</h1>
-    <h4><a href="/">Back to Main page</a></h4>
-    <h4><a href="/login">Login</a></h4>
+    <a href="/" class="login_link">Back to Main page</a>
+    <a href="/login" class="login_link">Login</a>
     <p>Username</p>
     <input type="text" minlength="4" name="username"><br>
     {% if invalid_username %}
         <p id="invalid_username">{{ invalid_username }}</p>
     {% endif %}
     <p>Password</p>
-    <input type="password" minlength="6" name="password"><br>
+    <input type="password" minlength="6" name="password">
     <input type="submit" value="Register">
 </form>
 </body>
