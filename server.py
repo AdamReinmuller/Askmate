@@ -385,8 +385,21 @@ def delete_question(question_id=None):
 
 @app.route('/question/<int:question_id>/<int:id>/<file_>/<method>')
 def vote(question_id=None, id=None, file_=None, method=None):
-    users_id = data_manager.get_userid_by_username(session['username'])
-    if file_ == 'answer':
+    try:
+        users_id = data_manager.get_userid_by_username(session['username'])
+    except KeyError:
+        return redirect('/')
+    answers = data_manager.sort_table(data_manager.answer_db, 'id', 'asc')
+    questions = data_manager.sort_table(data_manager.question_db, 'id', 'asc')
+    voted_questions_of_user = list(map(lambda x: x['question_id'],
+                                       data_manager.get_foreign_key_by_id(data_manager.user_vote_db, 'question_id',
+                                                                          users_id)))
+    voted_answers_of_user = list(map(lambda x: x['answer_id'],
+                                     data_manager.get_foreign_key_by_id(data_manager.user_vote_db, 'answer_id',
+                                                                        users_id)))
+    if file_ == 'answer'\
+            and not users_id == data_manager.get_foreign_key_by_id(data_manager.answer_db, 'users_id', id)[0]['users_id']\
+            and answers[id-1]['id'] not in voted_answers_of_user:
         data_manager.change_vote_number_in_table(data_manager.answer_db, id, method)
         data_manager.add_vote_to_user_vote(None, id, users_id)
         user_id = data_manager.get_user_id_by_answer_id(id)
@@ -394,7 +407,9 @@ def vote(question_id=None, id=None, file_=None, method=None):
             data_manager.increase_reputation('answer', user_id=user_id)
         elif method == 'down':
             data_manager.reduce_reputation(user_id=user_id)
-    else:
+    elif file_ == 'question'\
+            and not users_id == data_manager.get_foreign_key_by_id(data_manager.question_db, 'users_id', id)[0]['users_id'] \
+            and questions[id-1]['id'] not in voted_questions_of_user:
         data_manager.change_vote_number_in_table(data_manager.question_db, id, method)
         data_manager.add_vote_to_user_vote(id, None, users_id)
         user_id = data_manager.get_user_id_by_question_id(id)
@@ -402,6 +417,8 @@ def vote(question_id=None, id=None, file_=None, method=None):
             data_manager.increase_reputation('question', user_id=user_id)
         elif method == 'down':
             data_manager.reduce_reputation(user_id=user_id)
+    else:
+        flash('Invalid user')
     return redirect('/question/{}'.format(question_id))
 
 
