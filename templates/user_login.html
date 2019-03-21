@@ -1,0 +1,11 @@
+{% if session.get('username') %}
+<div id="logout">
+    <button class="logout_button"><a href="/logout" class="menu_point">Logout</a></button>
+{% else %}
+<div id="login">
+    <a href="/registration" class="register_button">Register</a>
+    <input type="text" class="username" name="username" placeholder="username">
+    <input type="password" class="username" name="password" placeholder="password">
+    <input type="submit" class="submit_bottom" value="Sign in">
+{% endif %}
+</div>
