@@ -129,7 +129,6 @@ def route_user(user_id):
 
 @app.route('/question/<int:question_id>')
 def route_question(question_id):
-    answer_statuses = list(map(lambda x: x['accepted_status'], data_manager.import_from_db(data_manager.answer_db)))
     user_id = data_manager.get_userid_by_username(session.get('username'))
     question = data_manager.get_line_data_by_id(data_manager.question_db, question_id)
     headers_q = data_manager.get_column_names_of_table(data_manager.question_db)
@@ -144,15 +143,23 @@ def route_question(question_id):
     for answer in answers:
         answer_ids[answer['id']] = [util.check_file('static/image_for_answer' + str(answer['id']) + '.png'),
                                     '/static/image_for_answer' + str(answer['id']) + '.png',
-                                    data_manager.get_lines_data_by_foreign_id(data_manager.comment_db, 'answer_id',
-                                                                              answer['id'])]
-    voted_questions_of_user = list(map(lambda x:x['question_id'], data_manager.get_foreign_key_by_id(data_manager.user_vote_db, 'question_id', user_id)))
-    voted_answers_of_user = list(map(lambda x:x['answer_id'], data_manager.get_foreign_key_by_id(data_manager.user_vote_db, 'answer_id', user_id)))
-    return render_template('question.html', question_id=question_id, question=question, headers_q=headers_q,
+                                    data_manager.get_lines_data_by_foreign_id(data_manager.comment_db, 'answer_id', answer['id'])]
+    if user_id:
+        answer_statuses = list(map(lambda x: x['accepted_status'], data_manager.import_from_db(data_manager.answer_db)))
+        voted_questions_of_user = list(map(lambda x: x['question_id'], data_manager.get_foreign_key_by_id(data_manager.user_vote_db,
+                                                                                  'question_id', user_id)))
+        voted_answers_of_user = list(map(lambda x: x['answer_id'], data_manager.get_foreign_key_by_id(data_manager.user_vote_db, 'answer_id',
+                                                                                user_id)))
+        return render_template('question.html', question_id=question_id, question=question, headers_q=headers_q,
+                                   comments_q=comments_q, headers_c=headers_c, answers=answers,
+                                   headers_a=headers_a, image_q=image_q, filename_q=filename_q, answer_ids=answer_ids,
+                                   tags=tags, user_id=user_id, voted_questions_of_user=voted_questions_of_user,
+                                   voted_answers_of_user=voted_answers_of_user, answer_statuses=answer_statuses)
+    else:
+        return render_template('question.html', question_id=question_id, question=question, headers_q=headers_q,
                            comments_q=comments_q, headers_c=headers_c, answers=answers,
                            headers_a=headers_a, image_q=image_q, filename_q=filename_q, answer_ids=answer_ids,
-                           tags=tags, user_id=user_id, voted_questions_of_user=voted_questions_of_user,
-                           voted_answers_of_user=voted_answers_of_user, answer_statuses=answer_statuses)
+                           tags=tags)
 
 
 @app.route('/question/<int:question_id>/view_counter')
