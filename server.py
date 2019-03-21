@@ -342,9 +342,15 @@ def delete_answer(answer_id=None):
 
 @app.route('/answer/<answer_id>/accept')
 def accept_answer(answer_id):
+    try:
+        user_id = data_manager.get_userid_by_username(session['username'])
+    except KeyError:
+        return redirect('/')
     answer_statuses = list(map(lambda x:x['accepted_status'], data_manager.import_from_db(data_manager.answer_db)))
-    if True not in answer_statuses:
+    if True not in answer_statuses and user_id == data_manager.get_foreign_key_by_id(data_manager.answer_db, 'users_id', answer_id)[0]['users_id']:
         data_manager.accept_answer(answer_id)
+    elif True not in answer_statuses and not user_id == data_manager.get_foreign_key_by_id(data_manager.answer_db, 'users_id', answer_id)[0]['users_id']:
+        flash('Invalid user')
     else:
         flash('You can only accept one answer')
     user_id = data_manager.get_user_id_by_answer_id(answer_id)
