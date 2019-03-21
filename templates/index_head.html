@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Askmate</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='icons/Askmate.ico') }}">
+</head>
+<body>
+{% include 'user_login.html' %}
+{% if session['username'] %}
+    <h1>Welcome {{ session['username'] }} to Askmate</h1>
+    <div class="menu">
+        <a href="/logout" class="menu_point">Logout</a>
+        <a href="/user/{{ user_id }}" class="menu_point">Your activities - {{ session['username'] }}'s user page</a>
+        <a href="/user-list" class="menu_point">List of all registered users</a>
+        <a href="/list" class="menu_point">List of all questions</a>
+        <a href="/tags" class="menu_point">All tags</a>
+        <a href="/add-question" class="menu_point">Add new question</a>
+    </div>
+{% else %}
+    <h1>Welcome to Askmate</h1>
+    <div class="menu">
+        <a href="/list" class="menu_point">List of all questions</a>
+        <a href="/tags" class="menu_point">All tags</a>
+        <a href="/registration" class="menu_point">Register</a>
+        <a href="/login" class="menu_point">Login</a>
+    </div>
+{% endif %}
+<br>
+<form action="/search" method="post">
+    <input type="text" name="search_phrase">
+    <input type="submit" value="Search">
+</form>
+<br>
+<table style="width:90%" border="1">
+    <tr>
+        <th>{{ header }}</th>
+        {% if session['username'] %}
+            <th>Add new answer</th>
+            <th>Delete question</th>
+            <th>Edit question</th>
+        {% endif %}
+    </tr>
+    {% for question in questions %}
+        <tr>
+            <td>
+                <a href="/question/{{ question['id'] }}/view_counter">{{ question['title'] }}</a>
+            </td>
+            {% if session['username'] %}
+                {% if user_id != question['users_id'] %}
+                    <td>
+                        <a href="/question/{{ question['id'] }}/new-answer">Add an answer</a>
+                    </td>
+                {% else %}
+                    <td>Not authorised</td>
+                {% endif %}
+                {% if user_id == question['users_id'] %}
+                    <td>
+                        <a href="/question/{{ question['id'] }}/delete" onclick="return confirm('Are you sure?')">Delete
+                            question</a>
+                    </td>
+                    <td>
+                        <a href="/add-question/{{ question['id'] }}">Edit question</a>
+                    </td>
+                {% else %}
+                    <td>Not authorised</td>
+                    <td>Not authorised</td>
+                {% endif %}
+            {% endif %}
+        </tr>
+    {% endfor %}
+</table>
+</body>
+</html>

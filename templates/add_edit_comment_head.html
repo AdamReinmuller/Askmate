@@ -8,14 +8,27 @@
 </head>
 <body>
 <h1>{{ 'Edit comment' if comment_id >=0 else 'Add comment' }}</h1>
-<h4><a href="/">Back to Main page</a></h4>
+<div class="menu">
+    <a href="/" class="menu_point">Back to Main page</a>
+    {% if session['username'] %}
+        <a href="/logout" class="menu_point">Logout</a>
+        <a href="/user/{{ user_id }}" class="menu_point">Your activities - {{ session['username'] }}'s user page</a>
+        <a href="/user-list" class="menu_point">List of all registered users</a>
+        <a href="/list" class="menu_point">List of all questions</a>
+        <a href="/tags" class="menu_point">All tags</a>
+        <a href="/add-question" class="menu_point">Add new question</a>
+    {% else %}
+        <a href="/registration" class="menu_point">Register</a>
+        <a href="/login" class="menu_point">Login</a>
+    {% endif %}
+</div>
+
 {% if comment_id >=0 %}
     <form method="POST">
         <label for="comment">Please edit your comment:</label><br>
         <textarea name="comment" rows="10" cols="70" minlength="10" required>{{ comment[0]['message'] }}</textarea><br>
         <button type="submit">Save edited comment</button>
     </form>
-
 {% else %}
     <form method="POST">
         <p>{{ 'Answer:' if answer_id else 'Question:' }} {{ answer_message if answer_id else question_title }}</p>

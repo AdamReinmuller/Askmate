@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>All tags</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='icons/Askmate.ico') }}">
+</head>
+<body>
+<h1>All tags</h1>
+<div class="menu">
+    <a href="/" class="menu_point">Back to Main page</a>
+    {% if session['username'] %}
+        <a href="/logout" class="menu_point">Logout</a>
+        <a href="/user/{{ user_id }}" class="menu_point">Your activities - {{ session['username'] }}'s user page</a>
+        <a href="/user-list" class="menu_point">List of all registered users</a>
+        <a href="/list" class="menu_point">List of all questions</a>
+        <a href="/add-question" class="menu_point">Add new question</a>
+    {% else %}
+        <a href="/list" class="menu_point">List of all questions</a>
+        <a href="/registration" class="menu_point">Register</a>
+        <a href="/login" class="menu_point">Login</a>
+    {% endif %}
+</div>
+<table border="1px">
+    <tr>
+        <th>Tag</th>
+        <th>Questions</th>
+    </tr>
+    {% for tag in data %}
+        <tr>
+            <td>{{ tag.name }}</td>
+            <td>{{ tag.count }}</td>
+        </tr>
+    {% endfor %}
+</table>
+</body>

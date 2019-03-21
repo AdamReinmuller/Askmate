@@ -8,20 +8,21 @@
 </head>
 <body>
 <h1>{{ 'Edit Question' if question_id else 'Add Question' }}</h1>
+<div class="menu">
+    <a href="/" class="menu_point">Back to Main page</a>
+    {% if session['username'] %}
+        <a href="/logout" class="menu_point">Logout</a>
+        <a href="/user/{{ user_id }}" class="menu_point">Your activities - {{ session['username'] }}'s user page</a>
+        <a href="/user-list" class="menu_point">List of all registered users</a>
+        <a href="/list" class="menu_point">List of all questions</a>
+        <a href="/tags" class="menu_point">All tags</a>
+    {% else %}
+        <a href="/registration" class="menu_point">Register</a>
+        <a href="/login" class="menu_point">Login</a>
+    {% endif %}
+</div>
 
 {% if question_id %}
-    <div class="menu">
-        <a href="/" class="menu_point">Back to Main page</a>
-        {% if session['username'] %}
-            <a href="/logout" class="menu_point">Logout</a>
-            <a href="/user/{{ user_id }}" class="menu_point">Your activities - {{ session['username'] }}'s user page</a>
-            <a href="/user-list" class="menu_point">List of all registered users</a>
-            <a href="/list" class="menu_point">List of all questions</a>
-        {% else %}
-            <a href="/registration" class="menu_point">Register</a>
-            <a href="/login" class="menu_point">Login</a>
-        {% endif %}
-    </div>
     <form method="POST">
         <p><strong>Title:</strong></p>
         <textarea name="question_title" rows="8" cols="30" required>{{ question['title'] }}</textarea>
@@ -31,8 +32,6 @@
     </form>
 
 {% else %}
-    <h4><a href="/">Back to Main page</a></h4>
-
     <form method="POST">
         <textarea name="question_title" rows="8" cols="30" required placeholder="Question title"></textarea><br>
         <textarea name="question" rows="10" cols="70" required placeholder="Your question"></textarea><br>
