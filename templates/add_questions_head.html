@@ -33,7 +33,9 @@
 
 {% else %}
     <form method="POST">
+        <p><strong>Title:</strong></p>
         <textarea name="question_title" rows="8" cols="30" required placeholder="Question title"></textarea><br>
+        <p><strong>Message:</strong></p>
         <textarea name="question" rows="10" cols="70" required placeholder="Your question"></textarea><br>
         <input type="submit" value="Add question">
     </form>

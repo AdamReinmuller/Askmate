@@ -8,21 +8,22 @@
 </head>
 <body>
 <h1>{{ 'Edit Answer' if answer_id else 'Post Answer' }}</h1>
+<div class="menu">
+    <a href="/" class="menu_point">Back to Main page</a>
+    {% if session['username'] %}
+        <a href="/logout" class="menu_point">Logout</a>
+        <a href="/user/{{ user_id }}" class="menu_point">Your activities - {{ session['username'] }}'s user page</a>
+        <a href="/user-list" class="menu_point">List of all registered users</a>
+        <a href="/list" class="menu_point">List of all questions</a>
+        <a href="/tags" class="menu_point">All tags</a>
+        <a href="/add-question" class="menu_point">Add new question</a>
+    {% else %}
+        <a href="/registration" class="menu_point">Register</a>
+        <a href="/login" class="menu_point">Login</a>
+    {% endif %}
+</div>
 
 {% if answer_id %}
-    <div class="menu">
-        <a href="/" class="menu_point">Back to Main page</a>
-        {% if session['username'] %}
-            <a href="/logout" class="menu_point">Logout</a>
-            <a href="/user/{{ user_id }}" class="menu_point">Your activities - {{ session['username'] }}'s user page</a>
-            <a href="/user-list" class="menu_point">List of all registered users</a>
-            <a href="/list" class="menu_point">List of all questions</a>
-            <a href="/tags" class="menu_point">All tags</a>
-        {% else %}
-            <a href="/registration" class="menu_point">Register</a>
-            <a href="/login" class="menu_point">Login</a>
-        {% endif %}
-    </div>
     <form method="POST">
         <p><strong> Question title: {{ question_title }} </strong></p>
         <p><textarea name="answer_message" rows="10" cols="70" required>{{ answer['message'] }}</textarea></p>
@@ -30,7 +31,6 @@
     </form>
 
 {% else %}
-    <h4><a href="/">Back to Main page</a></h4>
     <form method="POST">
         <p><strong> Question title: {{ question_title }} </strong></p>
         <p><textarea name="answer_message" rows="10" cols="70" minlength="10" required></textarea></p>

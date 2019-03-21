@@ -32,3 +32,21 @@ def verify_password(plain_text_password, hashed_password):
     hashed_bytes_password = hashed_password.encode('utf-8')
     value = bcrypt.checkpw(plain_text_password.encode('utf-8'), hashed_bytes_password)
     return value
+
+def sort_list_of_table_rows(table, key="", sort=""):
+    """
+    :key: by what fieldname you sort it
+    :sort: asc or desc
+    :return: questions in a list of ordered dictionaries
+    """
+    if sort == 'desc':
+        try:
+            sorted_table = sorted(table, key=lambda x: int(x[key]), reverse=True)
+        except:
+            sorted_table = sorted(table, key=lambda x: x[key], reverse=True)
+    elif sort == 'asc':
+        try:
+            sorted_table = sorted(table, key=lambda x: int(x[key]), reverse=False)
+        except:
+            sorted_table = sorted(table, key=lambda x: x[key], reverse=False)
+    return sorted_table

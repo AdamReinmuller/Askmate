@@ -49,12 +49,11 @@ def add_comment(question_id=None, answer_id=None, comment=None, comment_id=-1):
         if request.path.startswith("/q"):
             question_title = data_manager.get_line_data_by_id(data_manager.question_db, question_id)[0]['title']
             return render_template('add_edit_comment_head.html', question_title=question_title, comment=comment,
-                                   comment_id=comment_id)
+                                   comment_id=comment_id, user_id=user_id)
         else:
             answer_message = data_manager.get_line_data_by_id(data_manager.answer_db, answer_id)[0]['message']
             return render_template('add_edit_comment_head.html', answer_id=answer_id, answer_message=answer_message,
-                                   comment=comment,
-                                   comment_id=comment_id)
+                                   comment=comment, comment_id=comment_id, user_id=user_id)
 
     elif request.method == 'POST':
         user_id = data_manager.get_userid_by_username(session.get('username'))
@@ -96,7 +95,7 @@ def edit_comment(comment_id):
         return redirect('/')
     if request.method == 'GET' and user_id == data_manager.get_foreign_key_by_id(data_manager.comment_db, 'users_id', comment_id)[0]['users_id']:
         comment = data_manager.get_line_data_by_id(data_manager.comment_db, comment_id)
-        return render_template('add_edit_comment_head.html', comment_id=comment_id, comment=comment)
+        return render_template('add_edit_comment_head.html', comment_id=comment_id, comment=comment, user_id=user_id)
 
     elif request.method == 'POST' and user_id == data_manager.get_foreign_key_by_id(data_manager.comment_db, 'users_id', comment_id)[0]['users_id']:
         data_manager.update_comment_message_submt_editedc_by_id(comment_id, request.form['comment'], util.get_time())
@@ -145,7 +144,9 @@ def route_question(question_id):
                                     '/static/image_for_answer' + str(answer['id']) + '.png',
                                     data_manager.get_lines_data_by_foreign_id(data_manager.comment_db, 'answer_id', answer['id'])]
     if user_id:
-        answer_statuses = list(map(lambda x: x['accepted_status'], data_manager.import_from_db(data_manager.answer_db)))
+        answer_statuses = list(map(lambda x: x['accepted_status'],
+                                   data_manager.get_lines_data_by_foreign_id(data_manager.answer_db, 'question_id',
+                                                                             question_id)))
         voted_questions_of_user = list(map(lambda x: x['question_id'], data_manager.get_foreign_key_by_id(data_manager.user_vote_db,
                                                                                   'question_id', user_id)))
         voted_answers_of_user = list(map(lambda x: x['answer_id'], data_manager.get_foreign_key_by_id(data_manager.user_vote_db, 'answer_id',
@@ -175,7 +176,7 @@ def add_image(question_id):
     except KeyError:
         return redirect('/')
     if request.method == 'GET' and user_id == data_manager.get_foreign_key_by_id(data_manager.question_db, 'users_id', question_id)[0]['users_id']:
-        return render_template('add-image_head.html', question_id=question_id)
+        return render_template('add-image_head.html', question_id=question_id, user_id=user_id)
     elif request.method == 'POST'and user_id == data_manager.get_foreign_key_by_id(data_manager.question_db, 'users_id', question_id)[0]['users_id']:
         url = request.form['URL']
         filename = 'static/image_for_question' + str(question_id) + '.png'
@@ -193,7 +194,7 @@ def add_image_a(question_id, answer_id):
     except KeyError:
         return redirect('/')
     if request.method == 'GET' and user_id == data_manager.get_foreign_key_by_id(data_manager.answer_db, 'users_id', answer_id)[0]['users_id']:
-        return render_template('add-image_head.html')
+        return render_template('add-image_head.html', user_id=user_id)
     elif request.method == 'POST' and user_id == data_manager.get_foreign_key_by_id(data_manager.answer_db, 'users_id', answer_id)[0]['users_id']:
         url = request.form['URL']
         filename = 'static/image_for_answer' + str(answer_id) + '.png'
@@ -245,7 +246,7 @@ def post_answer(question_id, answer_id=""):
         single_question = data_manager.get_line_data_by_id(data_manager.question_db, question_id)
         question_title = single_question[0]['title']
         answer = data_manager.get_line_data_by_id(data_manager.answer_db, answer_id)[0]
-        return render_template('post-answer_head.html', question_title=question_title, answer=answer, answer_id=answer_id)
+        return render_template('post-answer_head.html', question_title=question_title, answer=answer, answer_id=answer_id, user_id=user_id)
 
     elif request.path == '/question/' + str(question_id) + '/' + str(answer_id) and request.method == 'POST':
         form_answer = request.form['answer_message']
@@ -260,7 +261,7 @@ def post_answer(question_id, answer_id=""):
         else:
             single_question = data_manager.get_line_data_by_id(data_manager.question_db, question_id)
             question_title = single_question[0]['title']
-            return render_template('post-answer_head.html', question_title=question_title, answer_id=answer_id)
+            return render_template('post-answer_head.html', question_title=question_title, answer_id=answer_id, user_id=user_id)
 
 
 @app.route('/add-question', methods=['GET', 'POST'])
@@ -272,7 +273,7 @@ def add_edit_question(question_id=None):
         return redirect('/')
     if question_id and request.method == 'GET' and user_id == data_manager.get_foreign_key_by_id(data_manager.question_db, 'users_id', question_id)[0]['users_id']:  # edit question
         question = data_manager.get_line_data_by_id(data_manager.question_db, question_id)[0]  # edit get
-        return render_template('add_questions_head.html', question=question, question_id=question_id)
+        return render_template('add_questions_head.html', question=question, question_id=question_id, user_id=user_id)
 
     elif request.method == 'POST' and question_id and user_id == data_manager.get_foreign_key_by_id(data_manager.question_db, 'users_id', question_id)[0]['users_id']:
         title = request.form['question_title']  # edit post
@@ -281,7 +282,7 @@ def add_edit_question(question_id=None):
         return redirect('/question/{}'.format(question_id))
 
     elif request.method == 'GET' and question_id is None:  # add get
-        return render_template('add_questions_head.html', question_id=question_id)
+        return render_template('add_questions_head.html', question_id=question_id, user_id=user_id)
 
     elif request.method == 'POST' and question_id is None:  # add post
         user_id = data_manager.get_userid_by_username(session.get('username'))
@@ -302,7 +303,7 @@ def add_tag_to_question(question_id=None):
         question = data_manager.get_question_by_id(question_id)  # add tag get
         question_title = question[0]['title']
         tags = data_manager.get_tags(question_id)
-        return render_template('add_tag_head.html', question_title=question_title, tags=tags, question_id=question_id)
+        return render_template('add_tag_head.html', question_title=question_title, tags=tags, question_id=question_id, user_id=user_id)
     elif request.method == 'POST' and user_id == data_manager.get_foreign_key_by_id(data_manager.question_db, 'users_id', question_id)[0]['users_id']:
         question = data_manager.get_question_by_id(question_id)
         question_id_to_add = question[0]['id']
@@ -349,17 +350,20 @@ def delete_answer(answer_id=None):
 
 @app.route('/answer/<answer_id>/accept')
 def accept_answer(answer_id):
+    answer = data_manager.get_line_data_by_id(data_manager.answer_db, answer_id)
+    question_users_id=data_manager.get_foreign_key_by_id(data_manager.question_db, 'users_id', answer[0]['question_id'])[0]['users_id']
     try:
         user_id = data_manager.get_userid_by_username(session['username'])
     except KeyError:
         return redirect('/')
-    answer_statuses = list(map(lambda x:x['accepted_status'], data_manager.import_from_db(data_manager.answer_db)))
-    if True not in answer_statuses and user_id == data_manager.get_foreign_key_by_id(data_manager.answer_db, 'users_id', answer_id)[0]['users_id']:
-        data_manager.accept_answer(answer_id)
-    elif True not in answer_statuses and not user_id == data_manager.get_foreign_key_by_id(data_manager.answer_db, 'users_id', answer_id)[0]['users_id']:
-        flash('Invalid user')
+    if answer[0]['accepted_status'] is False and user_id == question_users_id:
+        answer_statuses = list(map(lambda x: x['accepted_status'], data_manager.get_lines_data_by_foreign_id(data_manager.answer_db, 'question_id', answer[0]['question_id'])))
+        if True not in answer_statuses:
+            data_manager.accept_answer(answer_id)
+        else:
+            flash('You can only accept one answer')
     else:
-        flash('You can only accept one answer')
+        flash('Invalid user')
     user_id = data_manager.get_user_id_by_answer_id(answer_id)
     data_manager.increase_reputation('accept', user_id)
     question_id = data_manager.get_foreign_key_by_id(data_manager.answer_db, 'question_id', answer_id)[0]['question_id']
@@ -477,15 +481,21 @@ def logout():
 
 @app.route('/tags')
 def tag_page():
+    user_id = data_manager.get_userid_by_username(session.get('username'))
     data = data_manager.get_tags_and_question_count()
-    return render_template('all_tags_head.html', data=data)
+    return render_template('all_tags_head.html', data=data, user_id=user_id)
 
 
 @app.route('/tags/<string:tag_name>')
+@app.route('/tags/<string:tag_name>/')
 def get_qestions_by_tag(tag_name):
+    user_id = data_manager.get_userid_by_username(session.get('username'))
     headers = data_manager.get_column_names_of_table(data_manager.question_db)
     questions = data_manager.get_questions_by_tag(tag_name)
-    return render_template('questions_by_tag_head.html', questions=questions, headers=headers, tag_name=tag_name)
+    if request.args:
+        questions = util.sort_list_of_table_rows(questions, request.args['order_by'],
+                                            request.args['order_direction'])
+    return render_template('questions_by_tag_head.html', questions=questions, headers=headers, tag_name=tag_name, user_id=user_id)
 
 
 
