@@ -288,6 +288,10 @@ def add_tag_to_question(question_id=None):
 @app.route('/question/<int:question_id>/<int:tag_id>/delete-tag')
 def delete_tag(question_id=None, tag_id=None):
     try:
+        user_id = data_manager.get_userid_by_username(session['username'])
+    except KeyError:
+        return redirect('/')
+    try:
         data_manager.delete_tag(question_id, tag_id)
     except:
         pass
