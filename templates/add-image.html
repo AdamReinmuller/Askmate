@@ -8,7 +8,18 @@
 </head>
 <body>
 <h1>Add image</h1>
-<h4><a href="/">Back to Main page</a></h4>
+<div class="menu">
+    <a href="/" class="menu_point">Back to Main page</a>
+    {% if session['username'] %}
+        <a href="/logout" class="menu_point">Logout</a>
+        <a href="/user/{{ user_id }}" class="menu_point">Your activities - {{ session['username'] }}'s user page</a>
+        <a href="/user-list" class="menu_point">List of all registered users</a>
+        <a href="/list" class="menu_point">List of all questions</a>
+    {% else %}
+        <a href="/registration" class="menu_point">Register</a>
+        <a href="/login" class="menu_point">Login</a>
+    {% endif %}
+</div>
 <form method="POST">
     <label for="URL">Please specify the URL for your image:</label><br>
     <input name="URL" type="text" size="70"><br>
