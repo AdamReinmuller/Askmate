@@ -139,14 +139,8 @@ def route_question(question_id):
                                     '/static/image_for_answer' + str(answer['id']) + '.png',
                                     data_manager.get_lines_data_by_foreign_id(data_manager.comment_db, 'answer_id',
                                                                               answer['id'])]
-    voted_questions_of_user_in_list = data_manager.get_foreign_key_by_id(data_manager.user_vote_db, 'question_id', user_id)
-    voted_answers_of_user_in_list = data_manager.get_foreign_key_by_id(data_manager.user_vote_db, 'answer_id', user_id)
-    voted_questions_of_user = []
-    voted_answers_of_user = []
-    for item in voted_questions_of_user_in_list:
-        voted_questions_of_user.append(item['question_id'])
-    for item in voted_answers_of_user_in_list:
-        voted_answers_of_user.append(item['answer_id'])
+    voted_questions_of_user = list(map(lambda x:x['question_id'], data_manager.get_foreign_key_by_id(data_manager.user_vote_db, 'question_id', user_id)))
+    voted_answers_of_user = list(map(lambda x:x['answer_id'], data_manager.get_foreign_key_by_id(data_manager.user_vote_db, 'answer_id', user_id)))
     return render_template('question.html', question_id=question_id, question=question, headers_q=headers_q,
                            comments_q=comments_q, headers_c=headers_c, answers=answers,
                            headers_a=headers_a, image_q=image_q, filename_q=filename_q, answer_ids=answer_ids,
