@@ -140,7 +140,9 @@ ALTER TABLE ONLY user_vote
 ALTER TABLE ONLY user_vote
     ADD CONSTRAINT fk_user_id FOREIGN KEY (id) REFERENCES users(id);
 
-INSERT INTO users VALUES (1, 'test', 'test hash', 0, '2019-01-01 05:49:00');
+INSERT INTO users VALUES (1, 'rajfta', '$2b$12$UrU3qREW4IKEF.s593Z0H.2Z1Y3n3L4DQ43aKnhCMGVvHXNy.x/G2', 0, '2019-01-01 05:49:00');
+INSERT INTO users VALUES (2, 'asdasd', '$2b$12$ybhDen8u0Se6fH1K/70UsOrFOOCcwy6L3HXmo2K76jQDdnF9t8igu', 0, '2019-01-01 05:49:00');
+INSERT INTO users VALUES (3, 'dsadsa', '$2b$12$Ry9Bxgz0Lxije7quhS0ntejCXJWkmn4h4T6Ux4bRuf8zNYMEi6yd2', 0, '2019-01-01 05:49:00');
 SELECT pg_catalog.setval('users_id_seq', 1, true);
 
 INSERT INTO question VALUES (0, '2017-04-28 08:29:00', 29, 7, 'How to make lists in Python?', 'I am totally new to this, any hints?', 'no image', 1);
@@ -157,12 +159,12 @@ INSERT INTO question VALUES (2, '2017-05-01 10:41:00', 1364, 57, 'Drawing canvas
 ', 'no image', 1);
 SELECT pg_catalog.setval('question_id_seq', 2, true);
 
-INSERT INTO answer VALUES (1, '2017-04-28 16:49:00', 4, 1, 'You need to use brackets: my_list = []', 'no image', 1, FALSE);
-INSERT INTO answer VALUES (2, '2017-04-25 14:42:00', 35, 1, 'Look it up in the Python docs', 'no image', 1, FALSE);
+INSERT INTO answer VALUES (1, '2017-04-28 16:49:00', 4, 1, 'You need to use brackets: my_list = []', 'no image', 2, FALSE);
+INSERT INTO answer VALUES (2, '2017-04-25 14:42:00', 35, 1, 'Look it up in the Python docs', 'no image', 3, FALSE);
 SELECT pg_catalog.setval('answer_id_seq', 2, true);
 
-INSERT INTO comment VALUES (1, 0, NULL, 'Please clarify the question as it is too vague!', '2017-05-01 05:49:00', 0, 1);
-INSERT INTO comment VALUES (2, NULL, 1, 'I think you could use my_list = list() as well.', '2017-05-02 16:55:00', 0, 1);
+INSERT INTO comment VALUES (1, 0, NULL, 'Please clarify the question as it is too vague!', '2017-05-01 05:49:00', 0, 2);
+INSERT INTO comment VALUES (2, NULL, 1, 'I think you could use my_list = list() as well.', '2017-05-02 16:55:00', 0, 3);
 SELECT pg_catalog.setval('comment_id_seq', 2, true);
 
 INSERT INTO tag VALUES (1, 'python');
