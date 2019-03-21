@@ -2,32 +2,42 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title> {{'Edit Question' if question_id else 'Add Question'}} </title>
+    <title> {{ 'Edit Question' if question_id else 'Add Question' }} </title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='icons/Askmate.ico') }}">
 </head>
 <body>
-    <h1>{{'Edit Question' if question_id else 'Add Question'}}</h1>
+<h1>{{ 'Edit Question' if question_id else 'Add Question' }}</h1>
 
-    {% if question_id %}
-        <h4><a href="/">Back to Main page</a></h4>
+{% if question_id %}
+    <div class="menu">
+        <a href="/" class="menu_point">Back to Main page</a>
+        {% if session['username'] %}
+            <a href="/logout" class="menu_point">Logout</a>
+            <a href="/user/{{ user_id }}" class="menu_point">Your activities - {{ session['username'] }}'s user page</a>
+            <a href="/user-list" class="menu_point">List of all registered users</a>
+            <a href="/list" class="menu_point">List of all questions</a>
+        {% else %}
+            <a href="/registration" class="menu_point">Register</a>
+            <a href="/login" class="menu_point">Login</a>
+        {% endif %}
+    </div>
+    <form method="POST">
+        <p><strong>Title:</strong></p>
+        <textarea name="question_title" rows="8" cols="30" required>{{ question['title'] }}</textarea>
+        <p><strong>Message:</strong></p>
+        <textarea name="question_message" rows="10" cols="70" required>{{ question['message'] }}</textarea><br>
+        <input type="submit" value="Edit question">
+    </form>
 
-        <form method="POST" >
-            <p><strong>Title:</strong></p>
-            <textarea name="question_title" rows="8" cols="30" required>{{ question['title'] }}</textarea>
-            <p><strong>Message:</strong></p>
-            <textarea name="question_message" rows="10" cols="70" required>{{ question['message'] }}</textarea><br>
-            <input type="submit" value="Edit question" >
-        </form>
+{% else %}
+    <h4><a href="/">Back to Main page</a></h4>
 
-    {% else %}
-        <h4><a href="/">Back to Main page</a></h4>
-
-        <form method="POST" >
-            <textarea name="question_title" rows="8" cols="30" required placeholder="Question title"></textarea><br>
-            <textarea name="question" rows="10" cols="70" required placeholder="Your question"></textarea><br>
-            <input type="submit" value="Add question" >
-        </form>
-    {% endif %}
+    <form method="POST">
+        <textarea name="question_title" rows="8" cols="30" required placeholder="Question title"></textarea><br>
+        <textarea name="question" rows="10" cols="70" required placeholder="Your question"></textarea><br>
+        <input type="submit" value="Add question">
+    </form>
+{% endif %}
 </body>
 </html>

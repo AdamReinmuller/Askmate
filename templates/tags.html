@@ -4,8 +4,10 @@
         {% for tag in tags %}
             <li>
                 <div class="tag">
-                    <a href="/tags/{{ tag['name'] }}" name="link">#{{ tag['name'] }}</a>
-                    <a href="/question/{{ question_id }}/{{ tag['id'] }}/delete-tag" name="del">x</a>
+                    <a href="/tags/{{ tag['name'] }}" name="link" title="all questions with this tag">#{{ tag['name'] }}</a>
+                    {% if session['username'] and user_id == question[0]['users_id'] %}
+                    <a href="/question/{{ question_id }}/{{ tag['id'] }}/delete-tag" name="del" title="delete tag">x</a>
+                    {% endif %}
                 </div>
             </li>
         {% endfor %}

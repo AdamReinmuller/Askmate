@@ -51,8 +51,7 @@
                         <a href="/question/{{ question['id'] }}/new-answer">Add an answer</a>
                     </td>
                 {% else %}
-                    <td>
-                    </td>
+                    <td>Not authorised</td>
                 {% endif %}
                 {% if user_id == question['users_id'] %}
                     <td>
@@ -63,10 +62,8 @@
                         <a href="/add-question/{{ question['id'] }}">Edit question</a>
                     </td>
                 {% else %}
-                    <td>
-                    </td>
-                    <td>
-                    </td>
+                    <td>Not authorised</td>
+                    <td>Not authorised</td>
                 {% endif %}
             {% endif %}
         </tr>

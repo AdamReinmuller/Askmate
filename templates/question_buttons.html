@@ -2,10 +2,6 @@
     <div class="question_buttons">
         <table align="center" cellpadding="40">
             <tr>
-                <td>
-                    <a href="/question/{{ question_id }}/add-tag">Add tag</a><br>
-                </td>
-
                 {% if user_id != question[0]['users_id'] %}
                     <td>
                         <a href="/question/{{ question_id }}/new-answer">Add an answer</a>
@@ -31,6 +27,9 @@
                     {% endif %}
                 {% endif %}
                 {% if user_id == question[0]['users_id'] %}
+                    <td>
+                        <a href="/question/{{ question_id }}/add-tag">Add tag</a><br>
+                    </td>
                     <td>
                         <a href="/question/{{ question_id }}/delete" onclick="return confirm('Are you sure?')">Delete
                             question</a>

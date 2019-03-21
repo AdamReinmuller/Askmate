@@ -8,14 +8,19 @@
 </head>
 <body>
 <h1>Search Results</h1>
-<h4><a href="/">Back to Main page</a></h4>
-{% if session['username'] %}
-    <h4><a href="/logout">Logout</a></h4>
-    <h4><a href="/user/{{ user_id }}">Your activities - {{ session['username'] }}'s user page</a></h4>
-{% else %}
-    <h4><a href="/registration">Register</a></h4>
-    <h4><a href="/login">Login</a></h4>
-{% endif %}
+<div class="menu">
+        <a href="/" class="menu_point">Back to Main page</a>
+        {% if session['username'] %}
+            <a href="/logout" class="menu_point">Logout</a>
+            <a href="/user/{{ user_id }}" class="menu_point">Your activities - {{ session['username'] }}'s user page</a>
+            <a href="/user-list" class="menu_point">List of all registered users</a>
+            <a href="/list" class="menu_point">List of all questions</a>
+            <a href="/add-question" class="menu_point">Add new question</a>
+        {% else %}
+            <a href="/registration" class="menu_point">Register</a>
+            <a href="/login" class="menu_point">Login</a>
+        {% endif %}
+    </div>
 <p>Search phrase: <span class="search_phrase">{{ search_phrase }}</span></p>
 <br>
 {% if questions|length > 0 %}

@@ -14,6 +14,8 @@
     {% if session['username'] %}
         <a href="/logout" class="menu_point">Logout</a>
         <a href="/user/{{ user_id }}" class="menu_point">Your activities - {{ session['username'] }}'s user page</a>
+        <a href="/list" class="menu_point">List of all questions</a>
+        <a href="/add-question" class="menu_point">Add new question</a>
         </div>
         <br>
         <table style="width:90%" border="1">
@@ -33,10 +35,9 @@
         </table>
     {% else %}
         <div class="menu">
-        <a href="/registration" class="menu_point">Register</a>
-        <a href="/login" class="menu_point">Login</a>
+            <a href="/registration" class="menu_point">Register</a>
+            <a href="/login" class="menu_point">Login</a>
         </div>
     {% endif %}
-
 </body>
 </html>

@@ -17,7 +17,9 @@
         <a href="/logout" class="menu_point">Logout</a>
         <a href="/user-list" class="menu_point">List of all registered users</a>
         <a href="/list" class="menu_point   ">List of all questions</a>
+        <a href="/add-question" class="menu_point">Add new question</a>
     </div>
+
     {% if questions_of_user != [] %}
         <p>Your questions:</p>
         <table style="width:90%" border="1">
@@ -100,6 +102,12 @@
             {% endif %}
         </table>
     {% endif %}
+{% else %}
+    <div class="menu">
+        <a href="/" class="menu_point">Back to Main page</a>
+        <a href="/registration" class="menu_point">Register</a>
+        <a href="/login" class="menu_point">Login</a>
+    </div>
 {% endif %}
 </body>
 </html>
