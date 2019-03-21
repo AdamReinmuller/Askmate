@@ -2,24 +2,27 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>List of all Questions</title>
+    <title>Questions by #{{ tag_name }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='icons/Askmate.ico') }}">
 </head>
 <body>
-{% include 'alert.html' %}
-<h1>List of all questions</h1>
+<h1>Questions by #{{ tag_name }}</h1>
 <div class="menu">
-<a href="/" class="menu_point">Back to Main page</a>
-{% if session['username'] %}
+    <a href="/" class="menu_point">Back to Main page</a>
+    {% if session['username'] %}
         <a href="/logout" class="menu_point">Logout</a>
         <a href="/user/{{ user_id }}" class="menu_point">Your activities - {{ session['username'] }}'s user page</a>
         <a href="/user-list" class="menu_point">List of all registered users</a>
+        <a href="/list" class="menu_point">List of all questions</a>
+        <a href="/tags" class="menu_point">All tags</a>
         <a href="/add-question" class="menu_point">Add new question</a>
-{% else %}
+    {% else %}
+        <a href="/list" class="menu_point">List of all questions</a>
+        <a href="/tags" class="menu_point">All tags</a>
         <a href="/registration" class="menu_point">Register</a>
         <a href="/login" class="menu_point">Login</a>
-{% endif %}
+    {% endif %}
 </div>
 <br>
 <table style="width:90%" border="1">
@@ -46,25 +49,16 @@
                 {% endif %}
             {% endfor %}
             {% if session['username'] %}
-                {% if user_id != question['users_id'] %}
-                    <td>
-                        <a href="/question/{{ question['id'] }}/new-answer">Add an answer</a>
-                    </td>
-                {% else %}
-                    <td>Not authorised</td>
-                {% endif %}
-                {% if user_id == question['users_id'] %}
-                    <td>
-                        <a href="/question/{{ question['id'] }}/delete" onclick="return confirm('Are you sure?')">Delete
-                            question</a>
-                    </td>
-                    <td>
-                        <a href="/add-question/{{ question['id'] }}">Edit question</a>
-                    </td>
-                {% else %}
-                    <td>Not authorised</td>
-                    <td>Not authorised</td>
-                {% endif %}
+                <td>
+                    <a href="/question/{{ question['id'] }}/new-answer">Add an answer</a>
+                </td>
+                <td>
+                    <a href="/question/{{ question['id'] }}/delete" onclick="return confirm('Are you sure?')">Delete
+                        question</a>
+                </td>
+                <td>
+                    <a href="/add-question/{{ question['id'] }}">Edit question</a>
+                </td>
             {% endif %}
         </tr>
     {% endfor %}

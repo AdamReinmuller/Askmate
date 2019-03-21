@@ -11,7 +11,7 @@ def index():
     user_id = data_manager.get_userid_by_username(session.get('username'))
     questions = data_manager.get_five_latest_submitted_titles_with_ids_from_table('question')
     header = data_manager.get_column_names_of_table(data_manager.question_db)[4]
-    return render_template('index.html', questions=questions, header=header, user_id=user_id)
+    return render_template('index_head.html', questions=questions, header=header, user_id=user_id)
 
 
 @app.route('/list')
@@ -23,7 +23,7 @@ def route_list():
     if request.args:
         questions = data_manager.sort_table(data_manager.question_db, request.args['order_by'],
                                             request.args['order_direction'])
-    return render_template('list.html', questions=questions, headers=headers, user_id=user_id)
+    return render_template('list_head.html', questions=questions, headers=headers, user_id=user_id)
 
 
 @app.route('/user-list')
@@ -35,7 +35,7 @@ def route_user_list():
     if request.args:
         users = data_manager.sort_table(data_manager.users_db, request.args['order_by'],
                                             request.args['order_direction'])
-    return render_template('user_list.html', users=users, headers=headers, user_id=user_id)
+    return render_template('user_list_head.html', users=users, headers=headers, user_id=user_id)
 
 
 @app.route('/question/<int:question_id>/new-comment', methods=['GET', 'POST'])
@@ -48,11 +48,11 @@ def add_comment(question_id=None, answer_id=None, comment=None, comment_id=-1):
     if request.method == 'GET':
         if request.path.startswith("/q"):
             question_title = data_manager.get_line_data_by_id(data_manager.question_db, question_id)[0]['title']
-            return render_template('comment.html', question_title=question_title, comment=comment,
+            return render_template('add_edit_comment_head.html', question_title=question_title, comment=comment,
                                    comment_id=comment_id)
         else:
             answer_message = data_manager.get_line_data_by_id(data_manager.answer_db, answer_id)[0]['message']
-            return render_template('comment.html', answer_id=answer_id, answer_message=answer_message,
+            return render_template('add_edit_comment_head.html', answer_id=answer_id, answer_message=answer_message,
                                    comment=comment,
                                    comment_id=comment_id)
 
@@ -96,7 +96,7 @@ def edit_comment(comment_id):
         return redirect('/')
     if request.method == 'GET' and user_id == data_manager.get_foreign_key_by_id(data_manager.comment_db, 'users_id', comment_id)[0]['users_id']:
         comment = data_manager.get_line_data_by_id(data_manager.comment_db, comment_id)
-        return render_template('comment.html', comment_id=comment_id, comment=comment)
+        return render_template('add_edit_comment_head.html', comment_id=comment_id, comment=comment)
 
     elif request.method == 'POST' and user_id == data_manager.get_foreign_key_by_id(data_manager.comment_db, 'users_id', comment_id)[0]['users_id']:
         data_manager.update_comment_message_submt_editedc_by_id(comment_id, request.form['comment'], util.get_time())
@@ -122,7 +122,7 @@ def route_user(user_id):
     headers_q = data_manager.get_column_names_of_table(data_manager.question_db)
     headers_c = data_manager.get_column_names_of_table(data_manager.comment_db)
     headers_a = data_manager.get_column_names_of_table(data_manager.answer_db)
-    return render_template('user_page.html', questions_of_user=questions_of_user, user_answers_questions=user_answers_questions,
+    return render_template('user_page_head.html', questions_of_user=questions_of_user, user_answers_questions=user_answers_questions,
                            question_comments=question_comments, answer_comments=answer_comments,
                            headers_q=headers_q, headers_a=headers_a, headers_c=headers_c, reputation=user_reputation, user_id=user_id)
 
@@ -150,13 +150,13 @@ def route_question(question_id):
                                                                                   'question_id', user_id)))
         voted_answers_of_user = list(map(lambda x: x['answer_id'], data_manager.get_foreign_key_by_id(data_manager.user_vote_db, 'answer_id',
                                                                                 user_id)))
-        return render_template('question.html', question_id=question_id, question=question, headers_q=headers_q,
+        return render_template('question_head.html', question_id=question_id, question=question, headers_q=headers_q,
                                    comments_q=comments_q, headers_c=headers_c, answers=answers,
                                    headers_a=headers_a, image_q=image_q, filename_q=filename_q, answer_ids=answer_ids,
                                    tags=tags, user_id=user_id, voted_questions_of_user=voted_questions_of_user,
                                    voted_answers_of_user=voted_answers_of_user, answer_statuses=answer_statuses)
     else:
-        return render_template('question.html', question_id=question_id, question=question, headers_q=headers_q,
+        return render_template('question_head.html', question_id=question_id, question=question, headers_q=headers_q,
                            comments_q=comments_q, headers_c=headers_c, answers=answers,
                            headers_a=headers_a, image_q=image_q, filename_q=filename_q, answer_ids=answer_ids,
                            tags=tags)
@@ -175,7 +175,7 @@ def add_image(question_id):
     except KeyError:
         return redirect('/')
     if request.method == 'GET' and user_id == data_manager.get_foreign_key_by_id(data_manager.question_db, 'users_id', question_id)[0]['users_id']:
-        return render_template('add-image.html', question_id=question_id)
+        return render_template('add-image_head.html', question_id=question_id)
     elif request.method == 'POST'and user_id == data_manager.get_foreign_key_by_id(data_manager.question_db, 'users_id', question_id)[0]['users_id']:
         url = request.form['URL']
         filename = 'static/image_for_question' + str(question_id) + '.png'
@@ -193,7 +193,7 @@ def add_image_a(question_id, answer_id):
     except KeyError:
         return redirect('/')
     if request.method == 'GET' and user_id == data_manager.get_foreign_key_by_id(data_manager.answer_db, 'users_id', answer_id)[0]['users_id']:
-        return render_template('add-image.html')
+        return render_template('add-image_head.html')
     elif request.method == 'POST' and user_id == data_manager.get_foreign_key_by_id(data_manager.answer_db, 'users_id', answer_id)[0]['users_id']:
         url = request.form['URL']
         filename = 'static/image_for_answer' + str(answer_id) + '.png'
@@ -245,7 +245,7 @@ def post_answer(question_id, answer_id=""):
         single_question = data_manager.get_line_data_by_id(data_manager.question_db, question_id)
         question_title = single_question[0]['title']
         answer = data_manager.get_line_data_by_id(data_manager.answer_db, answer_id)[0]
-        return render_template('post-answer.html', question_title=question_title, answer=answer, answer_id=answer_id)
+        return render_template('post-answer_head.html', question_title=question_title, answer=answer, answer_id=answer_id)
 
     elif request.path == '/question/' + str(question_id) + '/' + str(answer_id) and request.method == 'POST':
         form_answer = request.form['answer_message']
@@ -260,7 +260,7 @@ def post_answer(question_id, answer_id=""):
         else:
             single_question = data_manager.get_line_data_by_id(data_manager.question_db, question_id)
             question_title = single_question[0]['title']
-            return render_template('post-answer.html', question_title=question_title, answer_id=answer_id)
+            return render_template('post-answer_head.html', question_title=question_title, answer_id=answer_id)
 
 
 @app.route('/add-question', methods=['GET', 'POST'])
@@ -272,7 +272,7 @@ def add_edit_question(question_id=None):
         return redirect('/')
     if question_id and request.method == 'GET' and user_id == data_manager.get_foreign_key_by_id(data_manager.question_db, 'users_id', question_id)[0]['users_id']:  # edit question
         question = data_manager.get_line_data_by_id(data_manager.question_db, question_id)[0]  # edit get
-        return render_template('add_questions.html', question=question, question_id=question_id)
+        return render_template('add_questions_head.html', question=question, question_id=question_id)
 
     elif request.method == 'POST' and question_id and user_id == data_manager.get_foreign_key_by_id(data_manager.question_db, 'users_id', question_id)[0]['users_id']:
         title = request.form['question_title']  # edit post
@@ -281,7 +281,7 @@ def add_edit_question(question_id=None):
         return redirect('/question/{}'.format(question_id))
 
     elif request.method == 'GET' and question_id is None:  # add get
-        return render_template('add_questions.html', question_id=question_id)
+        return render_template('add_questions_head.html', question_id=question_id)
 
     elif request.method == 'POST' and question_id is None:  # add post
         user_id = data_manager.get_userid_by_username(session.get('username'))
@@ -302,7 +302,7 @@ def add_tag_to_question(question_id=None):
         question = data_manager.get_question_by_id(question_id)  # add tag get
         question_title = question[0]['title']
         tags = data_manager.get_tags(question_id)
-        return render_template('add_tag.html', question_title=question_title, tags=tags, question_id=question_id)
+        return render_template('add_tag_head.html', question_title=question_title, tags=tags, question_id=question_id)
     elif request.method == 'POST' and user_id == data_manager.get_foreign_key_by_id(data_manager.question_db, 'users_id', question_id)[0]['users_id']:
         question = data_manager.get_question_by_id(question_id)
         question_id_to_add = question[0]['id']
@@ -436,14 +436,14 @@ def search():
     headers = data_manager.get_column_names_of_table(data_manager.question_db)
     questions = data_manager.search(search_phrase)
     answers = data_manager.search_answers(search_phrase)
-    return render_template('search_results.html', questions=questions, answers=answers,
+    return render_template('search_results_head.html', questions=questions, answers=answers,
                            headers=headers, search_phrase=search_phrase, user_id=user_id)
 
 
 @app.route('/registration', methods=['GET', 'POST'])
 def register():
     if request.method == 'GET':
-        return render_template('registration.html')
+        return render_template('registration_head.html')
     elif request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -452,7 +452,7 @@ def register():
             return redirect('/')
         except:
             invalid_username = 'Username is taken'
-            return render_template('registration.html', invalid_username=invalid_username)
+            return render_template('registration_head.html', invalid_username=invalid_username)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -464,9 +464,9 @@ def login():
             return redirect('/')
         else:
             invalid_username_or_password = 'invalid username or password'
-            return render_template('login.html', invalid_username_or_password=invalid_username_or_password)
+            return render_template('login_head.html', invalid_username_or_password=invalid_username_or_password)
     elif request.method == 'GET':
-        return render_template('login.html')
+        return render_template('login_head.html')
 
 
 @app.route('/logout')
@@ -478,14 +478,14 @@ def logout():
 @app.route('/tags')
 def tag_page():
     data = data_manager.get_tags_and_question_count()
-    return render_template('all_tags.html', data=data)
+    return render_template('all_tags_head.html', data=data)
 
 
 @app.route('/tags/<string:tag_name>')
 def get_qestions_by_tag(tag_name):
     headers = data_manager.get_column_names_of_table(data_manager.question_db)
     questions = data_manager.get_questions_by_tag(tag_name)
-    return render_template('questions_by_tag.html', questions=questions, headers=headers, tag_name=tag_name)
+    return render_template('questions_by_tag_head.html', questions=questions, headers=headers, tag_name=tag_name)
 
 
 

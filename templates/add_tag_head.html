@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add tag to question</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='icons/Askmate.ico') }}">
+</head>
+<body>
+<h1>{{ question_title }}</h1>
+{% if tags %}
+    {% for tag in tags %}
+        <div class="tag">
+            <a href="/tags/{{ tag['name'] }}" name="link">#{{ tag['name'] }}</a>
+            <a href="/question/{{ question_id }}/{{ tag['id'] }}/delete-tag" name="del">x</a>
+        </div>
+    {% endfor %}
+{% endif %}
+<form method="post">
+    <input type="text" name="new_tag">
+    <input type="submit" value="Add tag">
+</form>
+</body>

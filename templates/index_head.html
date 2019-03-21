@@ -14,12 +14,14 @@
         <a href="/user/{{ user_id }}" class="menu_point">Your activities - {{ session['username'] }}'s user page</a>
         <a href="/user-list" class="menu_point">List of all registered users</a>
         <a href="/list" class="menu_point">List of all questions</a>
+        <a href="/tags" class="menu_point">All tags</a>
         <a href="/add-question" class="menu_point">Add new question</a>
     </div>
 {% else %}
     <h1>Welcome to Askmate</h1>
     <div class="menu">
         <a href="/list" class="menu_point">List of all questions</a>
+        <a href="/tags" class="menu_point">All tags</a>
         <a href="/registration" class="menu_point">Register</a>
         <a href="/login" class="menu_point">Login</a>
     </div>
