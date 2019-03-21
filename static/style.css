@@ -16,6 +16,16 @@ body * {
     background: deepskyblue;
 }
 
+::placeholder {
+    color: white;
+}
+
+input {
+    color: white;
+    border: 0;
+    background: #736a71;
+}
+
 #login {
     padding: 5px;
     background: #ff5658;
