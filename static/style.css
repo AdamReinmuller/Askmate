@@ -43,6 +43,23 @@ a:hover {
     color: black;
 }
 
+a {
+    color: #6a0808
+}
+
+tr:hover{
+    background-color: #fea7a2;
+}
+
+.answer_buttons tr:hover {background: #9f989d; border:0
+}
+.question_buttons tr:hover {background: #9f989d; border: 0
+}
+
+th {
+    background-color: #ff5658;
+}
+
 
 /*tags a {*/
 /*    text-decoration: none;*/
@@ -154,3 +171,6 @@ ul[name=tag_list]{
     border-radius: 4px;
 }
 
+table {border-radius: 4px;
+    border: hidden;
+}
