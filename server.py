@@ -211,7 +211,7 @@ def delete_question_image(question_id):
         user_id = data_manager.get_userid_by_username(session['username'])
     except KeyError:
         return redirect('/')
-    if user_id == data_manager.get_foreign_key_by_id(data_manager.answer_db, 'users_id', answer_id)[0]['users_id']:
+    if user_id == data_manager.get_foreign_key_by_id(data_manager.question_db, 'users_id', question_id)[0]['users_id']:
         filename = 'static/image_for_question' + str(question_id) + '.png'
         util.delete_file(filename)
         data_manager.update_image_data_by_id(data_manager.question_db, question_id, 'no image')
