@@ -1,3 +1,13 @@
+body {
+    font-family: 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva', 'Verdana', sans-serif;
+    background: #9f989d;
+    border-radius: 5px;
+}
+
+body * {
+    border-radius: 5px;
+}
+
 .search_phrase {
     color: #ff5658;
     text-decoration: underline;
@@ -5,6 +15,34 @@
 #answer_col {
     background: deepskyblue;
 }
+
+::placeholder {
+    color: white;
+}
+
+input {
+    color: white;
+    border: 0;
+    background: #736a71;
+}
+
+#login {
+    padding: 5px;
+    background: #ff5658;
+    width: max-content;
+    float: right;
+    text-align: left;
+}
+
+.register_button {
+    display: block;
+    margin: 0px 0px 10px 0px;
+}
+
+a:hover {
+    color: #ff5658;
+}
+
 
 /*tags a {*/
 /*    text-decoration: none;*/
@@ -115,3 +153,4 @@ ul[name=tag_list]{
 #registration_form input{
     border-radius: 4px;
 }
+
